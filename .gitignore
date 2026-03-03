@@ -1,0 +1,88 @@
+# ===========================
+# Sistema Operativo
+# ===========================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# ===========================
+# Editores e IDEs
+# ===========================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# JetBrains (WebStorm, etc.)
+.idea/
+*.iml
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ===========================
+# Dependencias y Módulos
+# ===========================
+
+# Node modules (si se usan herramientas de desarrollo)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ===========================
+# Archivos Temporales
+# ===========================
+
+# Archivos temporales generales
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# Logs
+*.log
+logs/
+
+# ===========================
+# Archivos de Proyecto
+# ===========================
+
+# Archivos de respaldo
+*.backup
+*.old
+
+# Archivos comprimidos (opcional, descomentar si son necesarios)
+*.zip
+*.rar
+*.7z

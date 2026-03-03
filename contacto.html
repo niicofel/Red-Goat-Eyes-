@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Red Goat Eyes </title>
+    <meta name="description" content=" Tienda de ropa urbana unisex "> 
+    <meta name="keywords" content=" ropa urbana, unisex, ecuador - quito, streetwear ">
+    <link rel="icon" type="image/png" href="assets/img/icons/RedGoatEyesIcon.png">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <header class="top-bar">
+        <div class="location">
+            <i class="fa-solid fa-location-dot"></i>
+            <span> Quito </span>
+        </div>
+    </header>
+
+        <nav class="navbar">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="assets/img/banners/RedGoatEyesBanner.png" alt="Red Goat Eyes logo banner">
+                </a>
+            </div>
+
+            <ul class="nav-links">
+                <li><a href="index.html"> Inicio </a></li>
+
+                <li class="dropdown">
+                    <a href="categorias.html"> Categorías <i class="fa-solid fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="hoodies.html">Hoodies</a></li>
+                        <li><a href="pantalones.html">Pantalones</a></li>
+                        <li><a href="accesorios.html">Accesorios</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="productos.html"> Productos </a></li>
+                <li><a href="contacto.html"> Contacto </a></li>
+            </ul>
+
+            <div class="nav-icons">
+                <a href="contacto.html"><i class="fa-regular fa-user"></i></a>
+            </div>
+
+        </nav>
+
+    <section class="contact-container">
+        <h1> Contacto </h1>
+        <form id="contactForm" novalidate>
+
+            <div class="form-group">
+                <label> Nombre </label>
+                <input type="text" id="nombre" name="nombre" required>
+                <small class="error"></small>
+            </div>
+
+            <div class="form-group">
+                <label> Ciudad </label>
+                <input type="text" id="ciudad" name="ciudad" required>
+                <small class="error"></small>
+            </div>
+
+            <div class="form-group">
+                <label> Correo </label>
+                <input type="email" id="email" name="email" required>
+                <small class="error"></small>
+            </div>
+
+            <div class="form-group">
+                <label> Asunto </label>
+                <select id="asunto" name="asunto" required>
+                    <option value=""> Seleccione un asunto </option>
+                    <option value="consulta"> Consulta </option>
+                    <option value="reclamo"> Reclamo </option>
+                    <option value="sugerencia"> Sugerencia </option>
+                </select>
+                <small class="error"></small>
+            </div>
+
+            <div class="form-group">
+                <label> Descripción </label>
+                <textarea id="descripcion" rows="5"></textarea>
+                <small class="error"></small>
+            </div>
+
+            <div class="form-group">
+                <label> Foto (Opcional) </label>
+                <input type="file" id="foto" name="foto" accept="image/*">
+                <small class="error"></small>
+            </div>
+
+            <button type="submit"> Enviar formulario </button>
+
+        </form>
+    </section>
+
+    <footer class="footer">
+
+        <div class="footer-top">
+
+            <div class="footer-left">
+                <p> Copyright © 2026 <strong> Red Goat Eyes </strong> | Creacion propia por niicofel & Eliboy </p>
+            </div>
+
+        </div>
+
+    </footer>
+
+    <script src="assets/js/script.js"></script>
+
+</body>
+</html>
