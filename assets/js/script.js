@@ -1,100 +1,138 @@
-document.addEventListener("DOMContentLoaded" , function() {
-    const form = document.getElementById("contactForm");
+document.addEventListener("DOMContentLoaded", () => {
+    const formulario = document.getElementById("contactForm");
 
-    form.addEventListener("submit", function(event) {
+    // El formulario solo existe en contacto.html.
+    if (!formulario) {
+        return;
+    }
+
+    const nombre = document.getElementById("nombre");
+    const ciudad = document.getElementById("ciudad");
+    const email = document.getElementById("email");
+    const asunto = document.getElementById("asunto");
+    const descripcion = document.getElementById("descripcion");
+    const mensajeExito = document.getElementById("mensajeExito");
+
+    const expresionCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    formulario.addEventListener("submit", (event) => {
         event.preventDefault();
-        
-        if (validarFormulario()) {
-            alert("¡Formulario enviado con éxito!");
-            form.reset();
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
+        limpiarMensajeExito();
 
-            document.querySelectorAll(".error-input").forEach(el => el.classList.remove("error-input"));
-            document.querySelectorAll(".error").forEach(el => el.textContent = "");
-            
-        } else {
-            console.log("Validación fallida.");
+        if (!validarFormulario()) {
+            return;
         }
-    }); 
+
+        mensajeExito.textContent = "¡Formulario enviado correctamente!";
+        formulario.reset();
+        limpiarTodosLosErrores();
+    });
 
     function validarFormulario() {
-        let itsValid = true;
+        let esValido = true;
 
-        // Validar Nombre
-        const nombre = document.getElementById("nombre");
-        if (nombre.value.trim().length < 3) {
-            mostrarError(nombre, "El nombre tiene que tener al menos 3 caracteres.");
-            itsValid = false;
+        const nombreValor = nombre.value.trim();
+        const ciudadValor = ciudad.value.trim();
+        const emailValor = email.value.trim();
+        const descripcionValor = descripcion.value.trim();
+
+        if (nombreValor === "") {
+            mostrarError(nombre, "El nombre es obligatorio.");
+            esValido = false;
+        } else if (nombreValor.length < 3) {
+            mostrarError(nombre, "El nombre debe contener al menos 3 caracteres.");
+            esValido = false;
         } else {
             limpiarError(nombre);
         }
 
-        // Validar Ciudad
-        const ciudad = document.getElementById("ciudad");
-        if (ciudad.value.trim() === "") {
-            mostrarError(ciudad, "El campo es obligatorio.");
-            itsValid = false;
+        if (ciudadValor === "") {
+            mostrarError(ciudad, "La ciudad es obligatoria.");
+            esValido = false;
         } else {
             limpiarError(ciudad);
         }
 
-        // Validad Correo
-        const email = document.getElementById("email");
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email.value)) {
-            mostrarError(email, "Ingrese un correo válido.");
-            itsValid = false;
+        if (emailValor === "") {
+            mostrarError(email, "El correo electrónico es obligatorio.");
+            esValido = false;
+        } else if (!expresionCorreo.test(emailValor)) {
+            mostrarError(email, "Ingrese un correo electrónico válido.");
+            esValido = false;
         } else {
             limpiarError(email);
         }
 
-        // Validar Asunto
-        const asunto = document.getElementById("asunto");
         if (asunto.value === "") {
             mostrarError(asunto, "Seleccione un asunto.");
-            itsValid = false;
+            esValido = false;
         } else {
             limpiarError(asunto);
         }
 
-        // Validar Descripción
-        const descripcion = document.getElementById("descripcion");
-        if (descripcion.value.trim().length < 10) {
-            mostrarError(descripcion, "Mensaje muy corto. Ingrese minimo 10 caracteres.");
-            itsValid = false;
+        if (descripcionValor === "") {
+            mostrarError(descripcion, "La descripción es obligatoria.");
+            esValido = false;
+        } else if (descripcionValor.length < 10) {
+            mostrarError(
+                descripcion,
+                "La descripción debe contener al menos 10 caracteres."
+            );
+            esValido = false;
         } else {
             limpiarError(descripcion);
         }
 
-        // Validar Foto
-        const foto = document.getElementById("foto");
-        limpiarError(foto);
-
-        return itsValid;
+        return esValido;
     }
 
     function mostrarError(elemento, mensaje) {
-        const grupo = elemento.parentElement;
-        const errorDisplay = grupo.querySelector(".error");
+        const grupo = elemento.closest(".form-group");
 
-        if (errorDisplay) {
-            errorDisplay.textContent = mensaje;
+        if (!grupo) {
+            return;
         }
+
+        const mensajeError = grupo.querySelector(".error");
+
         elemento.classList.add("error-input");
+        elemento.setAttribute("aria-invalid", "true");
+
+        if (mensajeError) {
+            mensajeError.textContent = mensaje;
+        }
     }
 
     function limpiarError(elemento) {
-        const grupo = elemento.parentElement;
-        const errorDisplay = grupo.querySelector(".error");
+        const grupo = elemento.closest(".form-group");
 
-        if (errorDisplay) {
-            errorDisplay.textContent = "";
+        if (!grupo) {
+            return;
         }
+
+        const mensajeError = grupo.querySelector(".error");
+
         elemento.classList.remove("error-input");
+        elemento.removeAttribute("aria-invalid");
+
+        if (mensajeError) {
+            mensajeError.textContent = "";
+        }
     }
+
+    function limpiarTodosLosErrores() {
+        [nombre, ciudad, email, asunto, descripcion].forEach((campo) => {
+            limpiarError(campo);
+        });
+    }
+
+    function limpiarMensajeExito() {
+        mensajeExito.textContent = "";
+    }
+
+    nombre.addEventListener("input", () => limpiarError(nombre));
+    ciudad.addEventListener("input", () => limpiarError(ciudad));
+    email.addEventListener("input", () => limpiarError(email));
+    asunto.addEventListener("change", () => limpiarError(asunto));
+    descripcion.addEventListener("input", () => limpiarError(descripcion));
 });
-
-

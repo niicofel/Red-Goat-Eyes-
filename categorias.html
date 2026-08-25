@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
-<head> 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Red Goat Eyes </title>
-    <meta name="description" content=" Tienda de ropa urbana unisex "> 
-    <meta name="keywords" content=" ropa urbana, unisex, ecuador - quito, streetwear ">
+    <title>Categorías | Red Goat Eyes</title>
+    <meta name="description" content="Explora las categorías de Red Goat Eyes: hoodies, pantalones y accesorios.">
+    <meta name="keywords" content="ropa urbana, streetwear, unisex, Quito, Ecuador, hoodies, pantalones, accesorios">
     <link rel="icon" type="image/png" href="assets/img/icons/RedGoatEyesIcon.png">
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -14,100 +14,105 @@
 
     <header class="top-bar">
         <div class="location">
-            <i class="fa-solid fa-location-dot"></i>
-            <span> Quito </span>
+            <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+            <span>Quito</span>
         </div>
     </header>
 
-        <nav class="navbar">
-            <div class="logo">
-                <a href="index.html">
-                    <img src="assets/img/banners/RedGoatEyesBanner.png" alt="Red Goat Eyes logo banner">
-                </a>
-            </div>
-
-            <ul class="nav-links">
-                <li><a href="index.html"> Inicio </a></li>
-
-                <li class="dropdown">
-                    <a href="categorias.html"> Categorías <i class="fa-solid fa-chevron-down"></i></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="hoodies.html">Hoodies</a></li>
-                        <li><a href="pantalones.html">Pantalones</a></li>
-                        <li><a href="accesorios.html">Accesorios</a></li>
-                    </ul>
-                </li>
-
-                <li><a href="productos.html"> Productos </a></li>
-                <li><a href="contacto.html"> Contacto </a></li>
-            </ul>
-
-            <div class="nav-icons">
-                <a href="contacto.html"><i class="fa-regular fa-user"></i></a>
-            </div>
-
-        </nav>
-
-        <section class="subsections">
-            <div class="cards-container">
-
-                <a href="hoodies.html" class="card">
-
-                    <div class="card-image">
-                        <span class="badge"> Hoodies </span>
-                        <img src="assets/img/categorias/Hoodie1Portada.png" alt="Hoodies">
-                    </div>
-
-                    <div class="card-info">
-                        <h3> Hoodies </h3>
-                        <div class="card-button"> Click Aquí </div>
-                    </div>
-
-                </a>
-
-                <a href="pantalones.html" class="card">
-
-                    <div class="card-image">
-                        <span class="badge"> Pantalones </span>
-                        <img src="assets/img/categorias/Pantalon1Portada.png" alt="Pantalones">
-                    </div>
-
-                    <div class="card-info">
-                        <h3> Pantalones </h3>
-                        <div class="card-button"> Click Aquí </div>
-                    </div>
-                </a>
-
-                <a href="accesorios.html" class="card">
-
-                    <div class="card-image"> 
-                        <span class="badge"> Accesorios </span>
-                        <img src="assets/img/categorias/Accesorios1Portada.png" alt="Accesorios">
-                    </div>
-
-                    <div class="card-info"> 
-                        <h3> Accesorios </h3>
-                        <div class="card-button"> Click Aquí </div>
-                    </div>
-
-                </a>
-
-            </div>
-        </section>
-
-    <footer class="footer">
-
-        <div class="footer-top">
-
-            <div class="footer-left">
-                <p> Copyright © 2026 <strong> Red Goat Eyes </strong> | Creacion propia por niicofel & Eliboy </p>
-            </div>
-
+    <nav class="navbar" aria-label="Navegación principal">
+        <div class="logo">
+            <a href="index.html" aria-label="Ir al inicio">
+                <img src="assets/img/banners/RedGoatEyesBanner.png" alt="Logo de Red Goat Eyes">
+            </a>
         </div>
 
-    </footer>
+        <ul class="nav-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li class="dropdown">
+                <a href="categorias.html">
+                    Categorías
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="hoodies.html">Hoodies</a></li>
+                    <li><a href="pantalones.html">Pantalones</a></li>
+                    <li><a href="accesorios.html">Accesorios</a></li>
+                </ul>
+            </li>
+            <li><a href="productos.html">Productos</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+        </ul>
 
-    <script src="assets/js/script.js"></script>
+        <div class="nav-icons">
+            <a href="contacto.html" aria-label="Ir a contacto">
+                <i class="fa-regular fa-user" aria-hidden="true"></i>
+            </a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="subsections">
+            <h1 class="section-title">Categorías</h1>
+
+            <div class="cards-container categories-grid">
+                <article class="card category-card">
+                    <a href="hoodies.html" class="card-link">
+                        <div class="card-image">
+                            <span class="badge">Hoodies</span>
+                            <img src="assets/img/categorias/Hoodie1Portada.png"
+                                 alt="Colección de hoodies Red Goat Eyes">
+                        </div>
+
+                        <div class="card-info">
+                            <h2>Hoodies</h2>
+                            <span class="card-button">Ver categoría</span>
+                        </div>
+                    </a>
+                </article>
+
+                <article class="card category-card">
+                    <a href="pantalones.html" class="card-link">
+                        <div class="card-image">
+                            <span class="badge">Pantalones</span>
+                            <img src="assets/img/categorias/Pantalon1Portada.png"
+                                 alt="Colección de pantalones Red Goat Eyes">
+                        </div>
+
+                        <div class="card-info">
+                            <h2>Pantalones</h2>
+                            <span class="card-button">Ver categoría</span>
+                        </div>
+                    </a>
+                </article>
+
+                <article class="card category-card">
+                    <a href="accesorios.html" class="card-link">
+                        <div class="card-image">
+                            <span class="badge">Accesorios</span>
+                            <img src="assets/img/categorias/Accesorios1Portada.png"
+                                 alt="Colección de accesorios Red Goat Eyes">
+                        </div>
+
+                        <div class="card-info">
+                            <h2>Accesorios</h2>
+                            <span class="card-button">Ver categoría</span>
+                        </div>
+                    </a>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-top">
+            <div class="footer-left">
+                <p>
+                    Copyright © 2026 <strong>Red Goat Eyes</strong>
+                    | Creación propia por niicofel & Eliboy
+                </p>
+            </div>
+        </div>
+    </footer>
 
 </body>
 </html>
