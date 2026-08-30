@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Panel de administración | Red Goat Eyes </title>
+    <meta name="description" content=" Gestión de productos, pedidos y reportes ">
+    <meta name="keywords" content=" ropa urbana, unisex, ecuador - quito, streetwear ">
+    <link rel="icon" type="image/png" href="../assets/img/icons/RedGoatEyesIcon.png">
+    <link rel="stylesheet" href="../assets/css/base.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+          integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer">
+</head>
+<body>
+
+    <header class="site-header">
+
+        <div class="top-bar">
+            <div class="location">
+                <i class="fa-solid fa-location-dot"></i>
+                <span> Quito </span>
+            </div>
+        </div>
+
+        <nav class="navbar">
+            <div class="logo">
+                <a href="../index.html">
+                    <img src="../assets/img/banners/RedGoatEyesBanner.png" alt="Red Goat Eyes logo banner">
+                </a>
+            </div>
+
+            <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <ul class="nav-links" id="nav-links">
+                <li><a href="../index.html"> Inicio </a></li>
+
+                <li class="dropdown">
+                    <a href="categorias.html"> Categorías <i class="fa-solid fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="hoodies.html">Hoodies</a></li>
+                        <li><a href="pantalones.html">Pantalones</a></li>
+                        <li><a href="accesorios.html">Accesorios</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="productos.html"> Productos </a></li>
+                <li><a href="contacto.html"> Contacto </a></li>
+            </ul>
+
+            <div class="nav-icons">
+                <a href="carrito.html" class="icono-carrito" aria-label="Ver carrito">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span id="carrito-contador" class="cart-count"> 0 </span>
+                </a>
+
+                <div class="usuario-menu">
+                    <button type="button" class="btn-usuario" id="btn-usuario" aria-label="Mi cuenta" aria-expanded="false">
+                        <i class="fa-regular fa-user"></i>
+                    </button>
+
+                    <ul class="usuario-dropdown" id="usuario-dropdown">
+                        <li class="usuario-saludo solo-cliente" id="usuario-saludo"></li>
+                        <li class="solo-invitado"><a href="login.html"> Iniciar sesión </a></li>
+                        <li class="solo-invitado"><a href="registro.html"> Crear cuenta </a></li>
+                        <li class="solo-cliente"><a href="carrito.html"> Mi carrito </a></li>
+                        <li class="solo-cliente"><button type="button" id="btn-salir"> Cerrar sesión </button></li>
+                    </ul>
+                </div>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+    <main>
+
+        <section class="admin-container">
+            <h1> Panel de administración </h1>
+
+            <div class="admin-tabs">
+                <button type="button" class="tab-btn activa" data-tab="reportes"> Reportes </button>
+                <button type="button" class="tab-btn" data-tab="productos"> Productos </button>
+                <button type="button" class="tab-btn" data-tab="pedidos"> Pedidos </button>
+                <button type="button" class="tab-btn" data-tab="mensajes"> Mensajes </button>
+            </div>
+        </section>
+
+        <section id="tab-reportes" class="admin-panel">
+
+            <article class="reporte">
+                <h2> Reporte 1: Ventas por categoría </h2>
+
+                <div class="reporte-filtros">
+                    <div class="filtro-grupo">
+                        <label for="rpt1-desde"> Desde </label>
+                        <input type="date" id="rpt1-desde" name="desde">
+                    </div>
+
+                    <div class="filtro-grupo">
+                        <label for="rpt1-hasta"> Hasta </label>
+                        <input type="date" id="rpt1-hasta" name="hasta">
+                    </div>
+
+                    <button type="button" id="btn-rpt1"> Generar </button>
+                </div>
+
+                <div class="tabla-scroll">
+                    <table id="tabla-rpt1">
+                        <thead>
+                            <tr>
+                                <th> Categoría </th>
+                                <th> Productos </th>
+                                <th> Unidades </th>
+                                <th> Total vendido </th>
+                                <th> Ranking </th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="reporte">
+                <h2> Reporte 2: Top clientes </h2>
+
+                <div class="tabla-scroll">
+                    <table id="tabla-rpt2">
+                        <thead>
+                            <tr>
+                                <th> Cliente </th>
+                                <th> Ciudad </th>
+                                <th> Pedidos </th>
+                                <th> Total comprado </th>
+                                <th> Ticket promedio </th>
+                                <th> Última compra </th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </article>
+
+        </section>
+
+        <section id="tab-productos" class="admin-panel oculto">
+            <article class="reporte">
+                <h2> Gestión de productos </h2>
+                <div class="tabla-scroll">
+                    <table id="tabla-productos">
+                        <thead>
+                            <tr>
+                                <th> Código </th>
+                                <th> Nombre </th>
+                                <th> Categoría </th>
+                                <th> Precio </th>
+                                <th> Stock </th>
+                                <th> Estado </th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+
+        <section id="tab-pedidos" class="admin-panel oculto">
+            <article class="reporte">
+                <h2> Gestión de pedidos </h2>
+                <div class="tabla-scroll">
+                    <table id="tabla-pedidos">
+                        <thead>
+                            <tr>
+                                <th> Código </th>
+                                <th> Cliente </th>
+                                <th> Fecha </th>
+                                <th> Total </th>
+                                <th> Estado </th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+
+        <section id="tab-mensajes" class="admin-panel oculto">
+            <article class="reporte">
+                <h2> Mensajes de contacto </h2>
+                <div class="tabla-scroll">
+                    <table id="tabla-mensajes">
+                        <thead>
+                            <tr>
+                                <th> Fecha </th>
+                                <th> Nombre </th>
+                                <th> Ciudad </th>
+                                <th> Asunto </th>
+                                <th> Estado </th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+
+        <div class="footer-top">
+
+            <div class="footer-left">
+                <p> Copyright © 2026 <strong> Red Goat Eyes </strong> | Creacion propia por niicofel & Eliboy </p>
+            </div>
+
+        </div>
+
+    </footer>
+
+    <script src="../assets/js/carrito-contador.js"></script>
+    <script src="../assets/js/menu.js"></script>
+    <script src="../assets/js/admin.js"></script>
+
+</body>
+</html>

@@ -1,23 +1,32 @@
 <!DOCTYPE html>
 <html lang="es">
-<head> 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Red Goat Eyes </title>
-    <meta name="description" content=" Tienda de ropa urbana unisex "> 
+    <title> Red Goat Eyes | Ropa urbana en Quito </title>
+    <meta name="description" content=" Tienda de ropa urbana unisex ">
     <meta name="keywords" content=" ropa urbana, unisex, ecuador - quito, streetwear ">
     <link rel="icon" type="image/png" href="assets/img/icons/RedGoatEyesIcon.png">
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+          integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer">
 </head>
 <body>
 
-    <header class="top-bar">
-        <div class="location">
-            <i class="fa-solid fa-location-dot"></i>
-            <span> Quito </span>
+    <header class="site-header">
+
+        <div class="top-bar">
+            <div class="location">
+                <i class="fa-solid fa-location-dot"></i>
+                <span> Quito </span>
+            </div>
         </div>
-    </header>
 
         <nav class="navbar">
             <div class="logo">
@@ -26,27 +35,53 @@
                 </a>
             </div>
 
-            <ul class="nav-links">
+            <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <ul class="nav-links" id="nav-links">
                 <li><a href="index.html"> Inicio </a></li>
 
                 <li class="dropdown">
-                    <a href="categorias.html"> Categorías <i class="fa-solid fa-chevron-down"></i></a>
+                    <a href="pages/categorias.html"> Categorías <i class="fa-solid fa-chevron-down"></i></a>
                     <ul class="dropdown-menu">
-                        <li><a href="hoodies.html">Hoodies</a></li>
-                        <li><a href="pantalones.html">Pantalones</a></li>
-                        <li><a href="accesorios.html">Accesorios</a></li>
+                        <li><a href="pages/hoodies.html">Hoodies</a></li>
+                        <li><a href="pages/pantalones.html">Pantalones</a></li>
+                        <li><a href="pages/accesorios.html">Accesorios</a></li>
                     </ul>
                 </li>
 
-                <li><a href="productos.html"> Productos </a></li>
-                <li><a href="contacto.html"> Contacto </a></li>
+                <li><a href="pages/productos.html"> Productos </a></li>
+                <li><a href="pages/contacto.html"> Contacto </a></li>
             </ul>
 
             <div class="nav-icons">
-                <a href="contacto.html"><i class="fa-regular fa-user"></i></a>
+                <a href="pages/carrito.html" class="icono-carrito" aria-label="Ver carrito">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span id="carrito-contador" class="cart-count"> 0 </span>
+                </a>
+
+                <div class="usuario-menu">
+                    <button type="button" class="btn-usuario" id="btn-usuario" aria-label="Mi cuenta" aria-expanded="false">
+                        <i class="fa-regular fa-user"></i>
+                    </button>
+
+                    <ul class="usuario-dropdown" id="usuario-dropdown">
+                        <li class="usuario-saludo solo-cliente" id="usuario-saludo"></li>
+                        <li class="solo-invitado"><a href="pages/login.html"> Iniciar sesión </a></li>
+                        <li class="solo-invitado"><a href="pages/registro.html"> Crear cuenta </a></li>
+                        <li class="solo-cliente"><a href="pages/carrito.html"> Mi carrito </a></li>
+                        <li class="solo-cliente"><button type="button" id="btn-salir"> Cerrar sesión </button></li>
+                    </ul>
+                </div>
+
             </div>
 
         </nav>
+
+    </header>
+
+    <main>
 
         <section class="hero">
             <div class="hero-overlay"></div>
@@ -69,8 +104,8 @@
                 </p>
 
                 <div class="social-icons">
-                    <a href="https://www.instagram.com/niicofel/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://www.instagram.com/elian.valenzuela.16/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.instagram.com/niicofel/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de niicofel"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.instagram.com/elian.valenzuela.16/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Elian Valenzuela"><i class="fa-brands fa-instagram"></i></a>
                 </div>
 
             </div>
@@ -79,42 +114,48 @@
 
         <section class="benefits">
 
-            <div class="benefit">
+            <article class="benefit">
                 <i class="fa-solid fa-truck"></i>
                 <h3> ENVIO RAPIDO </h3>
                 <p> Entrega en menos de 48 horas </p>
-            </div>
+            </article>
             
-            <div class="benefit">
+            <article class="benefit">
                 <i class="fa-solid fa-arrows-rotate"></i>
                 <h3> ECOLOGICO </h3>
                 <p> Material sostenible </p>
-            </div>
+            </article>
 
-            <div class="benefit">
+            <article class="benefit">
                 <i class="fa-solid fa-credit-card"></i>
                 <h3> COMPRA SEGURA </h3>
                 <p> Puntos fisicos en Quito </p>
-            </div>
+            </article>
 
-            <div class="benefit">
+            <article class="benefit">
                 <i class="fa-solid fa-tags"></i>
                 <h3> REBAJAS </h3>
                 <p> Ofertas en cada drop </p>
-            </div>
+            </article>
 
         </section>
 
-        <footer class="footer">
+    </main>
 
-            <div class="footer-top">
+    <footer class="footer">
 
-                <div class="footer-left">
-                    <p> Copyright © 2026 <strong> Red Goat Eyes </strong> | Creacion propia por niicofel & Eliboy </p>
-                </div>
+        <div class="footer-top">
 
+            <div class="footer-left">
+                <p> Copyright © 2026 <strong> Red Goat Eyes </strong> | Creacion propia por niicofel & Eliboy </p>
             </div>
 
-        </footer>
+        </div>
+
+    </footer>
+
+    <script src="assets/js/carrito-contador.js"></script>
+    <script src="assets/js/menu.js"></script>
+
 </body>
 </html>

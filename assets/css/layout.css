@@ -1,0 +1,239 @@
+.site-header {
+    position: relative;
+    z-index: 1000;
+}
+
+.top-bar {
+    background-color: var(--gris-barra);
+    padding: 8px 40px;
+    font-size: 14px;
+}
+
+.location {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background-color: var(--blanco);
+    position: relative;
+    z-index: 1000;
+}
+
+.logo img {
+    width: 180px;
+    height: auto;
+    display: block;
+}
+
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--negro-suave);
+    cursor: pointer;
+    padding: 8px;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 35px;
+}
+
+.nav-links li {
+    position: relative;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--negro-suave);
+    font-weight: 600;
+    font-size: 15px;
+    transition: var(--transicion);
+}
+
+.nav-links a:hover {
+    color: var(--rojo);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: var(--blanco);
+    list-style: none;
+    padding: 15px 0;
+    width: 180px;
+    box-shadow: var(--sombra);
+    display: none;
+    z-index: 2000;
+}
+
+.dropdown-menu li {
+    padding: 8px 20px;
+}
+
+.dropdown-menu li a {
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.dropdown:hover > .dropdown-menu {
+    display: block;
+}
+
+.nav-icons {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.nav-icons a {
+    font-size: 18px;
+    color: var(--negro-suave);
+    text-decoration: none;
+    transition: var(--transicion);
+}
+
+.nav-icons a:hover {
+    color: var(--rojo);
+}
+
+.icono-carrito {
+    position: relative;
+}
+
+.cart-count {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background: var(--rojo);
+    color: var(--blanco);
+    font-size: 11px;
+    font-weight: bold;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+}
+
+.hero {
+    position: relative;
+    min-height: 80vh;
+    background-image: url('../img/banners/banner2.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--blanco);
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.hero-content {
+    position: relative;
+    max-width: 800px;
+    padding: 20px;
+}
+
+.hero h1 {
+    font-size: 40px;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+    color: var(--blanco);
+}
+
+.hero p {
+    font-size: 20px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.social-icons a {
+    font-size: 40px;
+    color: var(--blanco);
+    transition: var(--transicion);
+}
+
+.social-icons a:hover {
+    color: var(--rojo);
+}
+
+.benefits {
+    background-color: var(--negro-benefits);
+    color: var(--blanco);
+    display: flex;
+    justify-content: space-around;
+    padding: 40px 20px;
+    text-align: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.benefit {
+    max-width: 200px;
+}
+
+.benefit i {
+    font-size: 28px;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.benefit h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.benefit p {
+    font-size: 14px;
+    color: var(--gris-claro);
+}
+
+.subsections,
+.catalogo {
+    padding: 60px 40px;
+    background: var(--gris-fondo);
+}
+
+.footer {
+    background-color: var(--negro);
+    color: var(--gris-claro);
+    padding: 30px 40px 10px 40px;
+    font-size: 14px;
+}
+
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #222222;
+    padding-bottom: 20px;
+}
+
+.footer-left p {
+    color: #aaaaaa;
+}

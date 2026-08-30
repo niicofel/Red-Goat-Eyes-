@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Hoodies | Red Goat Eyes </title>
+    <meta name="description" content=" Hoodies oversize de gramaje pesado ">
+    <meta name="keywords" content=" ropa urbana, unisex, ecuador - quito, streetwear ">
+    <link rel="icon" type="image/png" href="../assets/img/icons/RedGoatEyesIcon.png">
+    <link rel="stylesheet" href="../assets/css/base.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+          integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer">
+</head>
+<body>
+
+    <header class="site-header">
+
+        <div class="top-bar">
+            <div class="location">
+                <i class="fa-solid fa-location-dot"></i>
+                <span> Quito </span>
+            </div>
+        </div>
+
+        <nav class="navbar">
+            <div class="logo">
+                <a href="../index.html">
+                    <img src="../assets/img/banners/RedGoatEyesBanner.png" alt="Red Goat Eyes logo banner">
+                </a>
+            </div>
+
+            <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <ul class="nav-links" id="nav-links">
+                <li><a href="../index.html"> Inicio </a></li>
+
+                <li class="dropdown">
+                    <a href="categorias.html"> Categorías <i class="fa-solid fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="hoodies.html">Hoodies</a></li>
+                        <li><a href="pantalones.html">Pantalones</a></li>
+                        <li><a href="accesorios.html">Accesorios</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="productos.html"> Productos </a></li>
+                <li><a href="contacto.html"> Contacto </a></li>
+            </ul>
+
+            <div class="nav-icons">
+                <a href="carrito.html" class="icono-carrito" aria-label="Ver carrito">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span id="carrito-contador" class="cart-count"> 0 </span>
+                </a>
+
+                <div class="usuario-menu">
+                    <button type="button" class="btn-usuario" id="btn-usuario" aria-label="Mi cuenta" aria-expanded="false">
+                        <i class="fa-regular fa-user"></i>
+                    </button>
+
+                    <ul class="usuario-dropdown" id="usuario-dropdown">
+                        <li class="usuario-saludo solo-cliente" id="usuario-saludo"></li>
+                        <li class="solo-invitado"><a href="login.html"> Iniciar sesión </a></li>
+                        <li class="solo-invitado"><a href="registro.html"> Crear cuenta </a></li>
+                        <li class="solo-cliente"><a href="carrito.html"> Mi carrito </a></li>
+                        <li class="solo-cliente"><button type="button" id="btn-salir"> Cerrar sesión </button></li>
+                    </ul>
+                </div>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+    <main>
+
+        <section class="catalogo">
+
+            <div class="cards-container">
+
+                <article class="card"
+                         data-id="RGE-HOO-001"
+                         data-nombre="SUPERNOVA"
+                         data-precio="35.00"
+                         data-imagen="../assets/img/productos/Hoodie1.png"
+                         data-categoria="Hoodie">
+
+                    <div class="card-image">
+                        <span class="badge"> Hoodie </span>
+                        <img src="../assets/img/productos/Hoodie1.png" alt="Hoodie SUPERNOVA">
+                    </div>
+
+                    <div class="card-info">
+                        <h3> SUPERNOVA </h3>
+                        <div class="price"> $35.00 </div>
+                        <button type="button" class="btn-agregar">
+                            <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
+                        </button>
+                    </div>
+
+                </article>
+
+                <article class="card"
+                         data-id="RGE-HOO-002"
+                         data-nombre="FADED ART"
+                         data-precio="35.00"
+                         data-imagen="../assets/img/productos/Hoodie2.png"
+                         data-categoria="Hoodie">
+
+                    <div class="card-image">
+                        <span class="badge"> Hoodie </span>
+                        <img src="../assets/img/productos/Hoodie2.png" alt="Hoodie FADED ART">
+                    </div>
+
+                    <div class="card-info">
+                        <h3> FADED ART </h3>
+                        <div class="price"> $35.00 </div>
+                        <button type="button" class="btn-agregar">
+                            <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
+                        </button>
+                    </div>
+
+                </article>
+
+                <article class="card"
+                         data-id="RGE-HOO-003"
+                         data-nombre="SCARLET CROS"
+                         data-precio="35.00"
+                         data-imagen="../assets/img/productos/Hoodie3.png"
+                         data-categoria="Hoodie">
+
+                    <div class="card-image">
+                        <span class="badge"> Hoodie </span>
+                        <img src="../assets/img/productos/Hoodie3.png" alt="Hoodie SCARLET CROS">
+                    </div>
+
+                    <div class="card-info">
+                        <h3> SCARLET CROS </h3>
+                        <div class="price"> $35.00 </div>
+                        <button type="button" class="btn-agregar">
+                            <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
+                        </button>
+                    </div>
+
+                </article>
+
+                <article class="card"
+                         data-id="RGE-HOO-004"
+                         data-nombre="COLD SPIRIT"
+                         data-precio="35.00"
+                         data-imagen="../assets/img/productos/Hoodie4.png"
+                         data-categoria="Hoodie">
+
+                    <div class="card-image">
+                        <span class="badge"> Hoodie </span>
+                        <img src="../assets/img/productos/Hoodie4.png" alt="Hoodie COLD SPIRIT">
+                    </div>
+
+                    <div class="card-info">
+                        <h3> COLD SPIRIT </h3>
+                        <div class="price"> $35.00 </div>
+                        <button type="button" class="btn-agregar">
+                            <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
+                        </button>
+                    </div>
+
+                </article>
+
+                <article class="card"
+                         data-id="RGE-HOO-005"
+                         data-nombre="EMERALD SAINT"
+                         data-precio="35.00"
+                         data-imagen="../assets/img/productos/Hoodie5.png"
+                         data-categoria="Hoodie">
+
+                    <div class="card-image">
+                        <span class="badge"> Hoodie </span>
+                        <img src="../assets/img/productos/Hoodie5.png" alt="Hoodie EMERALD SAINT">
+                    </div>
+
+                    <div class="card-info">
+                        <h3> EMERALD SAINT </h3>
+                        <div class="price"> $35.00 </div>
+                        <button type="button" class="btn-agregar">
+                            <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
+                        </button>
+                    </div>
+
+                </article>
+
+                <article class="card"
+                         data-id="RGE-HOO-006"
+                         data-nombre="NOIR BOTANICA"
+                         data-precio="35.00"
+                         data-imagen="../assets/img/productos/Hoodie6.png"
+                         data-categoria="Hoodie">
+
+                    <div class="card-image">
+                        <span class="badge"> Hoodie </span>
+                        <img src="../assets/img/productos/Hoodie6.png" alt="Hoodie NOIR BOTANICA">
+                    </div>
+
+                    <div class="card-info">
+                        <h3> NOIR BOTANICA </h3>
+                        <div class="price"> $35.00 </div>
+                        <button type="button" class="btn-agregar">
+                            <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
+                        </button>
+                    </div>
+
+                </article>
+
+                <article class="card"
+                         data-id="RGE-HOO-007"
+                         data-nombre="HAVEN"
+                         data-precio="35.00"
+                         data-imagen="../assets/img/productos/Hoodie7.png"
+                         data-categoria="Hoodie">
+
+                    <div class="card-image">
+                        <span class="badge"> Hoodie </span>
+                        <img src="../assets/img/productos/Hoodie7.png" alt="Hoodie HAVEN">
+                    </div>
+
+                    <div class="card-info">
+                        <h3> HAVEN </h3>
+                        <div class="price"> $35.00 </div>
+                        <button type="button" class="btn-agregar">
+                            <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
+                        </button>
+                    </div>
+
+                </article>
+
+                <article class="card"
+                         data-id="RGE-HOO-008"
+                         data-nombre="COBALT BLOOM"
+                         data-precio="35.00"
+                         data-imagen="../assets/img/productos/Hoodie8.png"
+                         data-categoria="Hoodie">
+
+                    <div class="card-image">
+                        <span class="badge"> Hoodie </span>
+                        <img src="../assets/img/productos/Hoodie8.png" alt="Hoodie COBALT BLOOM">
+                    </div>
+
+                    <div class="card-info">
+                        <h3> COBALT BLOOM </h3>
+                        <div class="price"> $35.00 </div>
+                        <button type="button" class="btn-agregar">
+                            <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
+                        </button>
+                    </div>
+
+                </article>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+
+        <div class="footer-top">
+
+            <div class="footer-left">
+                <p> Copyright © 2026 <strong> Red Goat Eyes </strong> | Creacion propia por niicofel & Eliboy </p>
+            </div>
+
+        </div>
+
+    </footer>
+
+    <script src="../assets/js/carrito-contador.js"></script>
+    <script src="../assets/js/menu.js"></script>
+    <script src="../assets/js/catalogo.js"></script>
+
+</body>
+</html>

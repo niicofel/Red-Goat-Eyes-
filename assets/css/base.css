@@ -1,0 +1,69 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --rojo: #c00000;
+    --rojo-oscuro: #900000;
+    --negro: #0a0a0a;
+    --negro-suave: #111111;
+    --negro-benefits: #0c0c0c;
+
+    --gris-barra: #f5f5f5;
+    --gris-fondo: #f4f4f4;
+    --gris-card: #eeeeee;
+    --gris-borde: #dddddd;
+    --gris-texto: #777777;
+    --gris-claro: #cccccc;
+    --gris-formulario: #635f5f;
+
+    --blanco: #ffffff;
+    --error: #ff4d4d;
+    --error-fondo: #fff0f0;
+    --exito: #2e7d32;
+
+    --fuente: Arial, Helvetica, sans-serif;
+    --radio: 4px;
+    --radio-grande: 8px;
+    --sombra: 0 5px 15px rgba(0, 0, 0, 0.1);
+    --sombra-fuerte: 0 10px 25px rgba(0, 0, 0, 0.2);
+    --transicion: 0.3s ease;
+}
+
+body {
+    font-family: var(--fuente);
+    background-color: var(--blanco);
+    color: var(--negro-suave);
+    min-height: 100vh;
+}
+
+main {
+    display: block;
+}
+
+img {
+    max-width: 100%;
+}
+
+.oculto {
+    display: none !important;
+}
+
+body.sin-sesion .solo-cliente {
+    display: none !important;
+}
+
+body.con-sesion .solo-invitado {
+    display: none !important;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid var(--rojo);
+    outline-offset: 2px;
+}

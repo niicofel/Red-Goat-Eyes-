@@ -1,29 +1,35 @@
-document.addEventListener("DOMContentLoaded" , function() {
+document.addEventListener("DOMContentLoaded", function () {
+
     const form = document.getElementById("contactForm");
 
-    form.addEventListener("submit", function(event) {
+    if (!form) {
+        return;
+    }
+
+    form.addEventListener("submit", function (event) {
         event.preventDefault();
-        
+
         if (validarFormulario()) {
-            alert("¡Formulario enviado con éxito!");
+            rgeNotificar("Formulario enviado con exito", "exito");
             form.reset();
+
             window.scrollTo({
                 top: 0,
                 behavior: "smooth"
             });
 
-            document.querySelectorAll(".error-input").forEach(el => el.classList.remove("error-input"));
-            document.querySelectorAll(".error").forEach(el => el.textContent = "");
-            
-        } else {
-            console.log("Validación fallida.");
+            document.querySelectorAll(".error-input").forEach(function (el) {
+                el.classList.remove("error-input");
+            });
+            document.querySelectorAll(".error").forEach(function (el) {
+                el.textContent = "";
+            });
         }
-    }); 
+    });
 
     function validarFormulario() {
         let itsValid = true;
 
-        // Validar Nombre
         const nombre = document.getElementById("nombre");
         if (nombre.value.trim().length < 3) {
             mostrarError(nombre, "El nombre tiene que tener al menos 3 caracteres.");
@@ -32,7 +38,6 @@ document.addEventListener("DOMContentLoaded" , function() {
             limpiarError(nombre);
         }
 
-        // Validar Ciudad
         const ciudad = document.getElementById("ciudad");
         if (ciudad.value.trim() === "") {
             mostrarError(ciudad, "El campo es obligatorio.");
@@ -41,7 +46,6 @@ document.addEventListener("DOMContentLoaded" , function() {
             limpiarError(ciudad);
         }
 
-        // Validad Correo
         const email = document.getElementById("email");
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email.value)) {
@@ -51,7 +55,6 @@ document.addEventListener("DOMContentLoaded" , function() {
             limpiarError(email);
         }
 
-        // Validar Asunto
         const asunto = document.getElementById("asunto");
         if (asunto.value === "") {
             mostrarError(asunto, "Seleccione un asunto.");
@@ -60,7 +63,6 @@ document.addEventListener("DOMContentLoaded" , function() {
             limpiarError(asunto);
         }
 
-        // Validar Descripción
         const descripcion = document.getElementById("descripcion");
         if (descripcion.value.trim().length < 10) {
             mostrarError(descripcion, "Mensaje muy corto. Ingrese minimo 10 caracteres.");
@@ -69,9 +71,22 @@ document.addEventListener("DOMContentLoaded" , function() {
             limpiarError(descripcion);
         }
 
-        // Validar Foto
         const foto = document.getElementById("foto");
         limpiarError(foto);
+
+        if (foto.files.length > 0) {
+            const archivo = foto.files[0];
+            const tiposPermitidos = ["image/png", "image/jpeg", "image/webp"];
+            const pesoMaximo = 2 * 1024 * 1024;
+
+            if (tiposPermitidos.indexOf(archivo.type) === -1) {
+                mostrarError(foto, "Solo se permiten imagenes PNG, JPG o WEBP.");
+                itsValid = false;
+            } else if (archivo.size > pesoMaximo) {
+                mostrarError(foto, "La imagen no puede pesar mas de 2 MB.");
+                itsValid = false;
+            }
+        }
 
         return itsValid;
     }
@@ -95,6 +110,5 @@ document.addEventListener("DOMContentLoaded" , function() {
         }
         elemento.classList.remove("error-input");
     }
+
 });
-
-
