@@ -10,6 +10,8 @@ set PGUSER=postgres
 set PGDATABASE_DESTINO=red_goat_eyes
 set PGCLIENTENCODING=UTF8
 
+set "PATH=%PATH%;C:\Program Files\PostgreSQL\18\bin"
+
 echo.
 echo ============================================================
 echo   RED GOAT EYES - Instalacion de la base de datos
