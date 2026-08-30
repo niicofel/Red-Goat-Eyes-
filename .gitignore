@@ -38,7 +38,7 @@ $RECYCLE.BIN/
 .vscode/
 *.code-workspace
 
-# JetBrains (WebStorm, etc.)
+# JetBrains (WebStorm, PyCharm, etc.)
 .idea/
 *.iml
 *.iws
@@ -48,10 +48,75 @@ $RECYCLE.BIN/
 *.sublime-workspace
 
 # ===========================
-# Dependencias y Módulos
+# Python
 # ===========================
 
-# Node modules (si se usan herramientas de desarrollo)
+# Bytecode compilado
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Entornos virtuales
+venv/
+env/
+ENV/
+.venv/
+env.bak/
+venv.bak/
+
+# Distribucion y empaquetado
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Testing y cobertura
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Flask
+instance/
+.webassets-cache
+
+# ===========================
+# Variables de entorno
+# CRITICO: nunca subir credenciales
+# ===========================
+.env
+.env.*
+*.env
+backend/.env
+!.env.example
+!backend/.env.example
+
+# ===========================
+# Credenciales de la base de datos
+# CRITICO: 07_credenciales.sql contiene las contrasenas de los roles.
+# Solo se versiona la plantilla .example
+# ===========================
+database/07_credenciales.sql
+!database/07_credenciales.sql.example
+
+# ===========================
+# Respaldos de la base de datos
+# Contienen los hashes de contrasena de los usuarios: son sensibles
+# ===========================
+database/backup/*.sql
+database/backup/*.dump
+database/backup/*.backup
+database/backup/*.tar
+!database/backup/backup.bat
+!database/backup/restaurar.bat
+!database/backup/estrategia_respaldo.md
+*.sqlite3
+*.db
+
+# ===========================
+# Dependencias Node (heredado)
+# ===========================
 node_modules/
 npm-debug.log*
 yarn-debug.log*
@@ -60,10 +125,13 @@ package-lock.json
 yarn.lock
 
 # ===========================
-# Archivos Temporales
+# Archivos subidos por usuarios
 # ===========================
+assets/img/uploads/
 
-# Archivos temporales generales
+# ===========================
+# Archivos temporales
+# ===========================
 *.tmp
 *.temp
 *.bak
@@ -75,14 +143,17 @@ yarn.lock
 logs/
 
 # ===========================
-# Archivos de Proyecto
+# Archivos de proyecto
 # ===========================
-
-# Archivos de respaldo
 *.backup
 *.old
 
-# Archivos comprimidos (opcional, descomentar si son necesarios)
+# Archivos comprimidos
 *.zip
 *.rar
 *.7z
+
+# ===========================
+# Mantener carpetas vacias
+# ===========================
+!.gitkeep
