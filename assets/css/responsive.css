@@ -1,0 +1,308 @@
+@media (max-width: 992px) {
+
+    .cards-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pagina-carrito,
+    .pagina-pago {
+        grid-template-columns: 1fr;
+    }
+
+    .carrito-resumen,
+    .pago-resumen {
+        position: static;
+    }
+
+    .nav-links {
+        gap: 22px;
+    }
+
+}
+
+@media (max-width: 768px) {
+
+    .navbar {
+        flex-wrap: wrap;
+        padding: 15px 20px;
+        gap: 15px;
+    }
+
+    .logo img {
+        width: 150px;
+    }
+
+    .menu-toggle {
+        display: block;
+        order: 2;
+    }
+
+    .nav-icons {
+        order: 3;
+        margin-left: auto;
+        margin-right: 12px;
+    }
+
+    .nav-links {
+        display: none;
+        order: 4;
+        width: 100%;
+        flex-direction: column;
+        gap: 0;
+        border-top: 1px solid var(--gris-borde);
+        padding-top: 10px;
+    }
+
+    .nav-links.abierto {
+        display: flex;
+    }
+
+    .nav-links li {
+        width: 100%;
+        border-bottom: 1px solid var(--gris-barra);
+    }
+
+    .nav-links li a {
+        display: block;
+        padding: 14px 4px;
+    }
+
+    .dropdown-menu {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+        padding: 0 0 0 18px;
+        background: var(--gris-barra);
+    }
+
+    .dropdown:hover > .dropdown-menu {
+        display: none;
+    }
+
+    .dropdown.abierto > .dropdown-menu {
+        display: block;
+    }
+
+    .hero {
+        min-height: 70vh;
+    }
+
+    .hero h1 {
+        font-size: 30px;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+
+    .social-icons a {
+        font-size: 32px;
+    }
+
+    .subsections,
+    .catalogo {
+        padding: 40px 20px;
+    }
+
+    .pagina-carrito,
+    .pagina-pago {
+        padding: 40px 20px;
+        gap: 25px;
+    }
+
+    .carrito-item {
+        grid-template-columns: 90px 1fr;
+        gap: 15px;
+    }
+
+    .carrito-item-imagen {
+        width: 90px;
+        height: 90px;
+    }
+
+    .carrito-item-acciones {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    .pago-formulario h1 {
+        font-size: 25px;
+    }
+
+    .bloque-pago {
+        padding: 20px;
+    }
+
+    .aviso-checkout {
+        margin: 30px 20px 0 20px;
+    }
+
+    .contact-container {
+        width: 90%;
+        margin: 40px auto;
+        padding: 25px;
+    }
+
+    .contact-container h1 {
+        font-size: 24px;
+    }
+
+    .gracias-container {
+        margin: 40px 20px;
+        padding: 35px 22px;
+    }
+
+    .gracias-container h1 {
+        font-size: 25px;
+    }
+
+    .gracias-acciones {
+        flex-direction: column;
+    }
+
+    .admin-container,
+    .admin-panel {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .admin-container h1 {
+        font-size: 24px;
+    }
+
+    .tab-btn {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+
+    .reporte {
+        padding: 20px;
+    }
+
+    .reporte-filtros {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .footer {
+        padding: 25px 20px 10px 20px;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .cards-container {
+        grid-template-columns: 1fr;
+    }
+
+    .card-image img {
+        height: 300px;
+    }
+
+    .benefits {
+        gap: 30px;
+    }
+
+    .metodo-opcion {
+        padding: 12px;
+        gap: 12px;
+    }
+
+}
+
+@media (max-width: 480px) {
+
+    .top-bar {
+        justify-content: center;
+        padding: 8px 10px;
+    }
+
+    .navbar {
+        padding: 12px 15px;
+    }
+
+    .logo img {
+        width: 130px;
+    }
+
+    .nav-links a {
+        font-size: 14px;
+    }
+
+    .hero h1 {
+        font-size: 25px;
+    }
+
+    .subsections,
+    .catalogo {
+        padding: 30px 15px;
+    }
+
+    .card-info {
+        padding: 15px;
+    }
+
+    .card-info h3 {
+        font-size: 18px;
+    }
+
+    .card-image img {
+        height: 260px;
+    }
+
+    .contact-container {
+        padding: 20px 15px;
+        border-radius: var(--radio);
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea,
+    .contact-container button[type="submit"] {
+        font-size: 16px;
+    }
+
+    .pagina-carrito,
+    .pagina-pago {
+        padding: 30px 15px;
+    }
+
+    .carrito-item {
+        grid-template-columns: 70px 1fr;
+        padding: 15px;
+    }
+
+    .carrito-item-imagen {
+        width: 70px;
+        height: 70px;
+    }
+
+    .carrito-resumen,
+    .pago-resumen {
+        padding: 22px;
+    }
+
+    .metodo-texto strong {
+        font-size: 14px;
+    }
+
+    .gracias-codigo strong {
+        font-size: 20px;
+    }
+
+    .gracias-datos p {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .notificacion {
+        left: 15px;
+        right: 15px;
+        bottom: 15px;
+    }
+
+}

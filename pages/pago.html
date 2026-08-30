@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Pago | Red Goat Eyes </title>
+    <meta name="description" content=" Confirma tu método de pago y finaliza la compra ">
+    <meta name="keywords" content=" ropa urbana, unisex, ecuador - quito, streetwear ">
+    <link rel="icon" type="image/png" href="../assets/img/icons/RedGoatEyesIcon.png">
+    <link rel="stylesheet" href="../assets/css/base.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+          integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer">
+</head>
+<body>
+
+    <header class="site-header">
+
+        <div class="top-bar">
+            <div class="location">
+                <i class="fa-solid fa-location-dot"></i>
+                <span> Quito </span>
+            </div>
+        </div>
+
+        <nav class="navbar">
+            <div class="logo">
+                <a href="../index.html">
+                    <img src="../assets/img/banners/RedGoatEyesBanner.png" alt="Red Goat Eyes logo banner">
+                </a>
+            </div>
+
+            <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <ul class="nav-links" id="nav-links">
+                <li><a href="../index.html"> Inicio </a></li>
+
+                <li class="dropdown">
+                    <a href="categorias.html"> Categorías <i class="fa-solid fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="hoodies.html">Hoodies</a></li>
+                        <li><a href="pantalones.html">Pantalones</a></li>
+                        <li><a href="accesorios.html">Accesorios</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="productos.html"> Productos </a></li>
+                <li><a href="contacto.html"> Contacto </a></li>
+            </ul>
+
+            <div class="nav-icons">
+                <a href="carrito.html" class="icono-carrito" aria-label="Ver carrito">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span id="carrito-contador" class="cart-count"> 0 </span>
+                </a>
+
+                <div class="usuario-menu">
+                    <button type="button" class="btn-usuario" id="btn-usuario" aria-label="Mi cuenta" aria-expanded="false">
+                        <i class="fa-regular fa-user"></i>
+                    </button>
+
+                    <ul class="usuario-dropdown" id="usuario-dropdown">
+                        <li class="usuario-saludo solo-cliente" id="usuario-saludo"></li>
+                        <li class="solo-invitado"><a href="login.html"> Iniciar sesión </a></li>
+                        <li class="solo-invitado"><a href="registro.html"> Crear cuenta </a></li>
+                        <li class="solo-cliente"><a href="carrito.html"> Mi carrito </a></li>
+                        <li class="solo-cliente"><button type="button" id="btn-salir"> Cerrar sesión </button></li>
+                    </ul>
+                </div>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+    <main class="pagina-pago">
+
+        <section class="pago-formulario">
+            <h1> Confirmar pago </h1>
+
+            <form id="pagoForm" novalidate>
+
+                <article class="bloque-pago">
+                    <h2> Datos del comprador </h2>
+
+                    <div class="form-group">
+                        <label for="pago-nombre"> Nombre completo </label>
+                        <input type="text" id="pago-nombre" name="nombre" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pago-email"> Correo para el recibo </label>
+                        <input type="email" id="pago-email" name="email" autocomplete="email" required>
+                        <small class="error"></small>
+                        <small class="ayuda-campo"> A este correo enviaremos tu recibo en PDF. </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pago-direccion"> Dirección de entrega </label>
+                        <input type="text" id="pago-direccion" name="direccion" required>
+                        <small class="error"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pago-referencia"> Referencia (Opcional) </label>
+                        <input type="text" id="pago-referencia" name="referencia">
+                        <small class="error"></small>
+                    </div>
+
+                </article>
+
+                <article class="bloque-pago">
+                    <h2> Método de pago </h2>
+
+                    <div class="metodos-pago">
+
+                        <label class="metodo-opcion" for="metodo-1">
+                            <input type="radio" id="metodo-1" name="metodo" value="Transferencia bancaria" checked>
+                            <span class="metodo-icono"><i class="fa-solid fa-building-columns"></i></span>
+                            <span class="metodo-texto">
+                                <strong> Transferencia bancaria </strong>
+                                <small> Recibirás los datos de la cuenta en tu recibo </small>
+                            </span>
+                        </label>
+
+                        <label class="metodo-opcion" for="metodo-2">
+                            <input type="radio" id="metodo-2" name="metodo" value="Efectivo contra entrega">
+                            <span class="metodo-icono"><i class="fa-solid fa-money-bill-wave"></i></span>
+                            <span class="metodo-texto">
+                                <strong> Efectivo contra entrega </strong>
+                                <small> Pagas al recibir tu pedido </small>
+                            </span>
+                        </label>
+
+                        <label class="metodo-opcion" for="metodo-3">
+                            <input type="radio" id="metodo-3" name="metodo" value="Deuna">
+                            <span class="metodo-icono"><i class="fa-solid fa-qrcode"></i></span>
+                            <span class="metodo-texto">
+                                <strong> Deuna </strong>
+                                <small> Recibirás el código QR en tu recibo </small>
+                            </span>
+                        </label>
+
+                        <label class="metodo-opcion" for="metodo-4">
+                            <input type="radio" id="metodo-4" name="metodo" value="Tarjeta de crédito">
+                            <span class="metodo-icono"><i class="fa-regular fa-credit-card"></i></span>
+                            <span class="metodo-texto">
+                                <strong> Tarjeta de crédito </strong>
+                                <small> El cobro se procesa en el punto de entrega </small>
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <small class="error" id="error-metodo"></small>
+
+                </article>
+
+                <div class="form-group grupo-confirmacion">
+                    <label class="confirmacion" for="pago-confirmo">
+                        <input type="checkbox" id="pago-confirmo" name="confirmo" required>
+                        <span> Confirmo que los datos son correctos y autorizo el pago. </span>
+                    </label>
+                    <small class="error"></small>
+                </div>
+
+                <button type="submit" id="btn-pagar"> Pagar </button>
+
+                <a href="carrito.html" class="enlace-seguir"> Volver al carrito </a>
+
+            </form>
+        </section>
+
+        <aside class="pago-resumen">
+            <h2> Tu pedido </h2>
+
+            <div id="pago-items" class="pago-lista"></div>
+
+            <div class="resumen-linea">
+                <span> Subtotal </span>
+                <span id="pago-subtotal"> $0.00 </span>
+            </div>
+
+            <div class="resumen-linea">
+                <span> IVA (15%) </span>
+                <span id="pago-iva"> $0.00 </span>
+            </div>
+
+            <div class="resumen-linea resumen-total">
+                <span> Total a pagar </span>
+                <span id="pago-total"> $0.00 </span>
+            </div>
+
+        </aside>
+
+    </main>
+
+    <footer class="footer">
+
+        <div class="footer-top">
+
+            <div class="footer-left">
+                <p> Copyright © 2026 <strong> Red Goat Eyes </strong> | Creacion propia por niicofel & Eliboy </p>
+            </div>
+
+        </div>
+
+    </footer>
+
+    <script src="../assets/js/carrito-contador.js"></script>
+    <script src="../assets/js/menu.js"></script>
+    <script src="../assets/js/pago.js"></script>
+
+</body>
+</html>
