@@ -1045,3 +1045,298 @@
     margin-bottom: 6px;
     word-break: break-word;
 }
+
+/* --- Indicador de Stock --- */
+.card {
+  position: relative;
+  cursor: pointer;
+}
+
+.badge-stock {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 6px 14px;
+  font-size: 12px;
+  text-transform: uppercase;
+  z-index: 2;
+}
+
+
+.badge-stock.disponible {
+  background-color: var(--exito);
+  color: var(--blanco);
+}
+
+.badge-stock.agotado {
+  background-color: var(--gris-texto);
+  color: var(--blanco);
+}
+
+/* ==========================================================================
+   MÓDULO DE STOCK Y MODAL DE DETALLE DE PRENDA (RED GOAT EYES)
+   ========================================================================== */
+
+/* --- Botón VER DETALLES en la Tarjeta Principal --- */
+.card {
+    position: relative;
+    cursor: pointer;
+    transition: transform var(--transicion), box-shadow var(--transicion);
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--sombra);
+}
+
+.card .btn-ver-mas {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--rojo);
+    color: var(--blanco);
+    border: none;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background-color var(--transicion);
+    text-transform: uppercase;
+    font-size: 13px;
+    border-radius: 0 0 var(--radio) var(--radio);
+}
+
+.card .btn-ver-mas:hover {
+    background-color: var(--rojo-oscuro);
+}
+
+
+/* --- Modal Emergente --- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; 
+    left: 0;
+    width: 100%; 
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(3px);
+}
+
+.modal-overlay.activo {
+    display: flex;
+}
+
+.modal-card {
+    background: var(--blanco);
+    color: var(--negro-suave);
+    width: 90%;
+    max-width: 750px;
+    padding: 24px;
+    border-radius: var(--radio-grande);
+    position: relative;
+    box-shadow: var(--sombra-fuerte);
+    border: 1px solid var(--gris-borde);
+}
+
+.btn-cerrar-modal {
+    position: absolute;
+    top: 12px; 
+    right: 16px;
+    background: none; 
+    border: none;
+    color: var(--gris-formulario);
+    font-size: 26px;
+    cursor: pointer;
+    transition: color var(--transicion);
+}
+
+.btn-cerrar-modal:hover {
+    color: var(--rojo);
+}
+
+.modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 20px;
+}
+
+@media (max-width: 650px) {
+    .modal-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.modal-img-wrapper img {
+    width: 100%;
+    background: var(--gris-card);
+    border-radius: var(--radio);
+    object-fit: cover;
+}
+
+.modal-categoria {
+    font-size: 11px;
+    color: var(--rojo);
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.modal-titulo {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 4px 0 8px 0;
+    text-transform: uppercase;
+}
+
+.modal-precio {
+    font-size: 18px;
+    color: var(--negro);
+    font-weight: bold;
+    margin-bottom: 14px;
+}
+
+.modal-seccion {
+    margin-bottom: 14px;
+}
+
+.modal-seccion h4 {
+    font-size: 11px;
+    color: var(--gris-texto);
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.modal-seccion p {
+    font-size: 13px;
+    color: var(--gris-formulario);
+    line-height: 1.4;
+}
+
+/* --- Selección de Tallas (S, M, L) --- */
+.modal-tallas-grid {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-talla-opcion {
+    min-width: 42px;
+    height: 38px;
+    background: var(--blanco);
+    border: 1px solid var(--gris-borde);
+    color: var(--negro-suave);
+    font-weight: bold;
+    font-size: 13px;
+    border-radius: var(--radio);
+    cursor: pointer;
+    transition: all var(--transicion);
+}
+
+.btn-talla-opcion:hover {
+    border-color: var(--rojo);
+    color: var(--rojo);
+}
+
+.btn-talla-opcion.selected {
+    background: var(--rojo);
+    border-color: var(--rojo);
+    color: var(--blanco);
+}
+
+.btn-talla-opcion.sin-stock {
+    opacity: 0.35;
+    cursor: not-allowed;
+    text-decoration: line-through;
+    background: var(--gris-fondo);
+    border-color: var(--gris-borde);
+}
+
+/* --- Fila Acciones (Cantidad + Añadir al Carrito) --- */
+.modal-acciones-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.selector-cantidad {
+    display: flex;
+    border: 1px solid var(--gris-borde);
+    border-radius: var(--radio);
+    background: var(--gris-fondo);
+    overflow: hidden;
+}
+
+.btn-cant {
+    width: 34px;
+    height: 40px;
+    background: none;
+    border: none;
+    color: var(--negro-suave);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background var(--transicion);
+}
+
+.btn-cant:hover {
+    background: var(--gris-borde);
+}
+
+.selector-cantidad input {
+    width: 36px;
+    height: 40px;
+    background: none;
+    border: none;
+    color: var(--negro-suave);
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.btn-agregar-modal {
+    flex: 1;
+    height: 40px;
+    background: var(--rojo);
+    color: var(--blanco);
+    border: none;
+    border-radius: var(--radio);
+    font-weight: bold;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background-color var(--transicion);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-agregar-modal:hover {
+    background: var(--rojo-oscuro);
+}
+
+/* --- Badges de Tallas en la Tarjeta Principal --- */
+.card-tallas-preview {
+    display: flex;
+    gap: 6px;
+    margin: 8px 0 12px 0;
+    justify-content: flex-start;
+}
+
+.badge-talla-card {
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border: 1px solid var(--gris-borde);
+    background: var(--gris-barra);
+    color: var(--negro-suave);
+    border-radius: 2px;
+}
+
+.badge-talla-card.agotada {
+    opacity: 0.3;
+    text-decoration: line-through;
+}
