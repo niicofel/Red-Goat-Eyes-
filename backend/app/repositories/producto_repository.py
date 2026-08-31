@@ -165,3 +165,21 @@ class ProductoRepository(BaseRepository):
                 categoria.agregar_producto(producto)
             categorias.append(categoria)
         return categorias
+
+    def obtener_tallas_por_producto(self, id_producto: int) -> list:
+        sql = """
+            SELECT pt.id_producto_talla, t.nombre_talla, pt.stock
+            FROM producto_talla pt
+            INNER JOIN talla t ON pt.id_talla = t.id_talla
+            WHERE pt.id_producto = %s AND pt.activo = TRUE
+            ORDER BY t.orden ASC;
+        """
+        filas = self.consultar_todos(sql, (id_producto,))
+        return [
+            {
+                "id_producto_talla": f["id_producto_talla"],
+                "nombre_talla": f["nombre_talla"],
+                "stock": f["stock"]
+            }
+            for f in filas
+        ]
