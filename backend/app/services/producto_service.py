@@ -33,17 +33,14 @@ class ProductoService:
             "destacado": fila["destacado"],
         }
 
-    def detalle(self, codigo: str) -> dict:
-        producto = self._repository.obtener_por_codigo(codigo)
-        if not producto:
-            raise RecursoNoEncontradoExcepcion("Producto no encontrado")
-        
-        # Obtener el desglose de tallas con su stock
-        tallas = self._repository.obtener_tallas_por_producto(producto.id_producto)
-        
-        data = producto.a_dict()
-        data["tallas"] = tallas  # [{ "id_producto_talla": 1, "nombre_talla": "S", "stock": 5 }, ...]
-        return data
+    def detalle(self, codigo):
+        producto = self._repo.obtener_por_codigo(codigo)
+        if producto is None:
+            raise ProductoNoEncontrado(codigo)
+
+        datos = producto.a_diccionario()
+        datos["tallas"] = self._repo.obtener_tallas_por_producto(producto.id_producto)
+        return datos
 
     def destacados(self, limite=8):
         return [p.a_diccionario() for p in self._repo.obtener_destacados(limite)]
