@@ -1,11 +1,12 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
 
     const formulario = document.getElementById("pagoForm");
+
     if (!formulario) {
         return;
     }
 
-    const sesion = rgeLeerSesion();
+    const sesion = await rgeCargarSesion();
 
     if (!sesion) {
         rgeNotificar("Debes iniciar sesion para pagar", "aviso");
@@ -15,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    const carrito = rgeLeerCarrito();
+    const carrito = await rgeSincronizarCarrito();
 
     if (carrito.length === 0) {
         rgeNotificar("Tu carrito esta vacio", "aviso");
@@ -28,22 +29,31 @@ document.addEventListener("DOMContentLoaded", function () {
     const campoNombre = document.getElementById("pago-nombre");
     const campoEmail  = document.getElementById("pago-email");
 
-    campoNombre.value = sesion.nombres + " " + sesion.apellidos;
+    campoNombre.value = sesion.nombre;
     campoEmail.value  = sesion.email;
 
-    pintarResumen(carrito);
+    let metodosPago = [];
 
-    formulario.addEventListener("submit", function (evento) {
+    try {
+        const datos = await rgeApi("/pedidos/metodos-pago");
+        metodosPago = datos.metodos;
+    } catch (error) {
+        rgeNotificar(error.mensaje, "aviso");
+    }
+
+    await pintarResumen(carrito);
+
+    formulario.addEventListener("submit", async function (evento) {
         evento.preventDefault();
 
         if (!validarPago()) {
             return;
         }
 
-        procesarPago(carrito);
+        await procesarPago();
     });
 
-    function pintarResumen(items) {
+    async function pintarResumen(items) {
         const contenedor = document.getElementById("pago-items");
         contenedor.textContent = "";
 
@@ -64,11 +74,40 @@ document.addEventListener("DOMContentLoaded", function () {
             contenedor.appendChild(fila);
         });
 
-        const totales = rgeCalcularTotales(items);
+        let totales;
+
+        try {
+            totales = await rgeCalcularTotalesServidor(items);
+        } catch (error) {
+            rgeNotificar(error.mensaje, "aviso");
+            totales = rgeCalcularTotales(items);
+        }
 
         document.getElementById("pago-subtotal").textContent = rgeFormatearPrecio(totales.subtotal);
         document.getElementById("pago-iva").textContent      = rgeFormatearPrecio(totales.iva);
         document.getElementById("pago-total").textContent    = rgeFormatearPrecio(totales.total);
+    }
+
+    function sinTildes(texto) {
+        return String(texto)
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim()
+            .toLowerCase();
+    }
+
+    function idMetodoSeleccionado() {
+        const marcado = document.querySelector('input[name="metodo"]:checked');
+
+        if (!marcado) {
+            return null;
+        }
+
+        const encontrado = metodosPago.find(function (metodo) {
+            return sinTildes(metodo.nombre) === sinTildes(marcado.value);
+        });
+
+        return encontrado ? encontrado.id_metodo : null;
     }
 
     function validarPago() {
@@ -89,9 +128,8 @@ document.addEventListener("DOMContentLoaded", function () {
             limpiarError(direccion);
         }
 
-        const metodo = document.querySelector('input[name="metodo"]:checked');
         const errorMetodo = document.getElementById("error-metodo");
-        if (!metodo) {
+        if (idMetodoSeleccionado() === null) {
             errorMetodo.textContent = "Seleccione un método de pago.";
             valido = false;
         } else {
@@ -109,59 +147,71 @@ document.addEventListener("DOMContentLoaded", function () {
         return valido;
     }
 
-    function generarCodigo() {
-        const anio = new Date().getFullYear();
-        const guardado = localStorage.getItem(RGE_CLAVE_NUMERO) || "0";
-        const numero = parseInt(guardado, 10) + 1;
+    async function procesarPago() {
+        const boton = formulario.querySelector('button[type="submit"]');
+        const textoOriginal = boton ? boton.textContent : "";
 
-        localStorage.setItem(RGE_CLAVE_NUMERO, numero);
-
-        return "RGE-" + anio + "-" + String(numero).padStart(4, "0");
-    }
-
-    function procesarPago(items) {
-        const totales = rgeCalcularTotales(items);
-        const metodo  = document.querySelector('input[name="metodo"]:checked');
-
-        const pedido = {
-            codigo:   generarCodigo(),
-            fecha:    new Date().toISOString(),
-            estado:   "Pagado",
-            items:    items,
-            subtotal: Number(totales.subtotal.toFixed(2)),
-            iva:      Number(totales.iva.toFixed(2)),
-            total:    Number(totales.total.toFixed(2)),
-            metodo_pago: metodo.value,
-            cliente: {
-                nombres:   sesion.nombres,
-                apellidos: sesion.apellidos,
-                cedula:    sesion.cedula,
-                email:     campoEmail.value.trim(),
-                ciudad:    sesion.ciudad
-            },
-            entrega: {
-                direccion:  document.getElementById("pago-direccion").value.trim(),
-                referencia: document.getElementById("pago-referencia").value.trim()
-            }
-        };
-
-        try {
-            localStorage.setItem(RGE_CLAVE_PEDIDO, JSON.stringify(pedido));
-            localStorage.removeItem(RGE_CLAVE_CARRITO);
-        } catch (error) {
-            console.error("No se pudo registrar el pedido:", error);
-            rgeNotificar("No se pudo procesar el pago", "aviso");
-            return;
+        if (boton) {
+            boton.disabled = true;
+            boton.textContent = "Procesando pago...";
         }
 
+        const items = rgeLeerCarrito().map(function (item) {
+            return {
+                id_producto_talla: item.id_producto_talla,
+                cantidad: item.cantidad
+            };
+        });
 
-        rgeNotificar("Pago confirmado. Generando tu recibo...", "exito");
+        try {
+            const respuesta = await rgeApi("/pedidos", {
+                cuerpo: {
+                    items: items,
+                    email: campoEmail.value.trim(),
+                    id_metodo_pago: idMetodoSeleccionado(),
+                    direccion: document.getElementById("pago-direccion").value.trim(),
+                    referencia: document.getElementById("pago-referencia").value.trim()
+                }
+            });
 
-        setTimeout(function () {
-            window.location.href = "gracias.html";
-        }, 1000);
+            localStorage.setItem(RGE_CLAVE_PEDIDO, respuesta.pedido.codigo_pedido);
+            rgeVaciarCarrito();
+
+            rgeNotificar("Pago confirmado. Generando tu recibo...", "exito");
+
+            setTimeout(function () {
+                window.location.href = "gracias.html";
+            }, 1000);
+
+        } catch (error) {
+            if (boton) {
+                boton.disabled = false;
+                boton.textContent = textoOriginal;
+            }
+
+            if (error.codigo === "STOCK_INSUFICIENTE") {
+                rgeNotificar(error.mensaje, "aviso");
+                await rgeSincronizarCarrito();
+                await pintarResumen(rgeLeerCarrito());
+                return;
+            }
+
+            if (error.codigo === "SIN_SESION") {
+                rgeNotificar("Tu sesion expiro. Inicia sesion de nuevo.", "aviso");
+                setTimeout(function () {
+                    window.location.href = "login.html?destino=pago";
+                }, 1200);
+                return;
+            }
+
+            if (error.campo === "direccion" || error.campo === "id_ciudad") {
+                mostrarError(document.getElementById("pago-direccion"), error.mensaje);
+                return;
+            }
+
+            rgeNotificar(error.mensaje, "aviso");
+        }
     }
-
 
     function mostrarError(elemento, mensaje) {
         const grupo = elemento.parentElement;

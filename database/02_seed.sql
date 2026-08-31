@@ -149,9 +149,9 @@ INSERT INTO cliente (id_cliente, nombres, apellidos, cedula, telefono, fecha_nac
 SELECT u.id_usuario, datos.nombres, datos.apellidos, datos.cedula,
        datos.telefono, datos.nacimiento::DATE, c.id_ciudad
 FROM (VALUES
-    ('maria.torres@example.com',  'Maria Fernanda', 'Torres Vega',    '1712345678', '0991234567', '2001-04-18', 'Quito'),
-    ('juan.ramirez@example.com',  'Juan Carlos',    'Ramirez Solis',  '0923456789', '0987654321', '1999-11-03', 'Guayaquil'),
-    ('ana.suarez@example.com',    'Ana Belen',      'Suarez Mora',    '0134567890', '0976543210', '2003-07-25', 'Cuenca')
+    ('maria.torres@example.com',  'Maria Fernanda', 'Torres Vega',    '1712345675', '0991234567', '2001-04-18', 'Quito'),
+    ('juan.ramirez@example.com',  'Juan Carlos',    'Ramirez Solis',  '0923456784', '0987654321', '1999-11-03', 'Guayaquil'),
+    ('ana.suarez@example.com',    'Ana Belen',      'Suarez Mora',    '0104567896', '0976543210', '2003-07-25', 'Cuenca')
 ) AS datos(email, nombres, apellidos, cedula, telefono, nacimiento, ciudad)
 JOIN usuario u ON u.email = datos.email
 JOIN ciudad  c ON c.nombre = datos.ciudad

@@ -1,9 +1,55 @@
-const RGE_CLAVE_CARRITO  = "rge_carrito";
-const RGE_CLAVE_PEDIDO   = "rge_ultimo_pedido";
-const RGE_CLAVE_NUMERO   = "rge_numero_pedido";
-const RGE_CLAVE_SESION   = "rge_sesion";
-const RGE_CLAVE_USUARIOS = "rge_usuarios";
+const RGE_CLAVE_CARRITO = "rge_carrito";
+const RGE_CLAVE_PEDIDO  = "rge_ultimo_pedido";
+const RGE_API = "/api";
 const RGE_IVA = 0.15;
+
+let rgeSesionActual = null;
+let rgeCatalogoCache = null;
+
+async function rgeApi(ruta, opciones) {
+    const config = Object.assign({
+        credentials: "same-origin",
+        headers: { "Accept": "application/json" }
+    }, opciones || {});
+
+    if (config.cuerpo !== undefined) {
+        config.method = config.method || "POST";
+        config.headers["Content-Type"] = "application/json";
+        config.body = JSON.stringify(config.cuerpo);
+        delete config.cuerpo;
+    }
+
+    let respuesta;
+
+    try {
+        respuesta = await fetch(RGE_API + ruta, config);
+    } catch (error) {
+        throw {
+            codigo: "SIN_CONEXION",
+            estado: 0,
+            mensaje: "No se pudo conectar con el servidor. Verifica que Flask este corriendo."
+        };
+    }
+
+    let datos = null;
+
+    try {
+        datos = await respuesta.json();
+    } catch (error) {
+        datos = null;
+    }
+
+    if (!respuesta.ok) {
+        throw {
+            codigo: (datos && datos.error) || "ERROR",
+            estado: respuesta.status,
+            mensaje: (datos && datos.mensaje) || "Ocurrio un error inesperado",
+            campo: datos && datos.campo
+        };
+    }
+
+    return datos;
+}
 
 function rgeLeerCarrito() {
     try {
@@ -25,6 +71,11 @@ function rgeGuardarCarrito(carrito) {
     }
 }
 
+function rgeVaciarCarrito() {
+    localStorage.removeItem(RGE_CLAVE_CARRITO);
+    rgeActualizarContador();
+}
+
 function rgeContarUnidades() {
     return rgeLeerCarrito().reduce(function (suma, item) {
         return suma + item.cantidad;
@@ -33,6 +84,7 @@ function rgeContarUnidades() {
 
 function rgeActualizarContador() {
     const contador = document.getElementById("carrito-contador");
+
     if (!contador) {
         return;
     }
@@ -42,65 +94,105 @@ function rgeActualizarContador() {
     contador.style.display = total > 0 ? "flex" : "none";
 }
 
-function rgeLeerUsuarios() {
-    try {
-        const datos = localStorage.getItem(RGE_CLAVE_USUARIOS);
-        const lista = datos ? JSON.parse(datos) : [];
-        return Array.isArray(lista) ? lista : [];
-    } catch (error) {
-        console.error("No se pudo leer la lista de usuarios:", error);
-        return [];
-    }
-}
-
-function rgeRegistrarUsuario(usuario) {
-    const lista = rgeLeerUsuarios();
-
-    const existe = lista.some(function (u) {
-        return u.email.toLowerCase() === usuario.email.toLowerCase();
-    });
-
-    if (existe) {
-        return false;
+async function rgeCatalogo() {
+    if (rgeCatalogoCache) {
+        return rgeCatalogoCache;
     }
 
-    lista.push(usuario);
-    localStorage.setItem(RGE_CLAVE_USUARIOS, JSON.stringify(lista));
-    return true;
+    const datos = await rgeApi("/productos");
+    rgeCatalogoCache = datos.productos;
+    return rgeCatalogoCache;
 }
 
-function rgeBuscarUsuario(email) {
-    return rgeLeerUsuarios().find(function (u) {
-        return u.email.toLowerCase() === email.toLowerCase();
+async function rgeBuscarPorCodigo(codigo) {
+    const catalogo = await rgeCatalogo();
+
+    return catalogo.find(function (producto) {
+        return producto.codigo === codigo;
     }) || null;
 }
 
-function rgeLeerSesion() {
-    try {
-        const datos = localStorage.getItem(RGE_CLAVE_SESION);
-        return datos ? JSON.parse(datos) : null;
-    } catch (error) {
-        console.error("No se pudo leer la sesion:", error);
-        return null;
+async function rgeSincronizarCarrito() {
+    const carrito = rgeLeerCarrito();
+
+    if (carrito.length === 0) {
+        return [];
     }
+
+    let catalogo;
+
+    try {
+        catalogo = await rgeCatalogo();
+    } catch (error) {
+        return carrito;
+    }
+
+    const vigentes = [];
+
+    carrito.forEach(function (item) {
+        const real = catalogo.find(function (producto) {
+            return producto.codigo === item.codigo;
+        });
+
+        if (!real) {
+            return;
+        }
+
+        item.id_producto_talla = real.id_producto_talla;
+        item.nombre = real.nombre;
+        item.precio = real.precio_final;
+        item.stock  = real.stock;
+
+        if (item.cantidad > real.stock) {
+            item.cantidad = real.stock;
+        }
+
+        if (item.cantidad > 0) {
+            vigentes.push(item);
+        }
+    });
+
+    rgeGuardarCarrito(vigentes);
+    return vigentes;
 }
 
-function rgeAbrirSesion(usuario) {
-    localStorage.setItem(RGE_CLAVE_SESION, JSON.stringify(usuario));
+async function rgeCargarSesion() {
+    try {
+        const datos = await rgeApi("/auth/sesion");
+        rgeSesionActual = datos.autenticado ? datos.usuario : null;
+    } catch (error) {
+        rgeSesionActual = null;
+    }
+
     rgeAplicarEstadoSesion();
+    return rgeSesionActual;
 }
 
-function rgeCerrarSesion() {
-    localStorage.removeItem(RGE_CLAVE_SESION);
-    rgeAplicarEstadoSesion();
+function rgeLeerSesion() {
+    return rgeSesionActual;
 }
 
 function rgeHaySesion() {
-    return rgeLeerSesion() !== null;
+    return rgeSesionActual !== null;
+}
+
+function rgeEsAdministrador() {
+    return rgeSesionActual !== null && rgeSesionActual.rol === "administrador";
+}
+
+async function rgeCerrarSesion() {
+    try {
+        await rgeApi("/auth/logout", { method: "POST" });
+    } catch (error) {
+        console.error("No se pudo cerrar la sesion:", error);
+    }
+
+    rgeSesionActual = null;
+    rgeAplicarEstadoSesion();
 }
 
 function rgeAplicarEstadoSesion() {
-    const sesion = rgeLeerSesion();
+    const sesion = rgeSesionActual;
     const cuerpo = document.body;
 
     if (sesion) {
@@ -112,17 +204,18 @@ function rgeAplicarEstadoSesion() {
     }
 
     const saludo = document.getElementById("usuario-saludo");
+
     if (saludo) {
-        saludo.textContent = sesion ? sesion.nombres + " " + sesion.apellidos : "";
+        saludo.textContent = sesion ? sesion.nombre : "";
     }
 
     const boton = document.getElementById("btn-usuario");
+
     if (boton) {
-        boton.title = sesion ? "Sesion de " + sesion.nombres : "Iniciar sesion";
+        boton.title = sesion ? "Sesion de " + sesion.nombre : "Iniciar sesion";
         boton.classList.toggle("sesion-activa", Boolean(sesion));
     }
 }
-
 
 function rgeIniciarMenuUsuario() {
     const boton = document.getElementById("btn-usuario");
@@ -153,9 +246,10 @@ function rgeIniciarMenuUsuario() {
     });
 
     const salir = document.getElementById("btn-salir");
+
     if (salir) {
-        salir.addEventListener("click", function () {
-            rgeCerrarSesion();
+        salir.addEventListener("click", async function () {
+            await rgeCerrarSesion();
             menu.classList.remove("abierto");
             rgeNotificar("Sesion cerrada", "aviso");
 
@@ -165,7 +259,6 @@ function rgeIniciarMenuUsuario() {
         });
     }
 }
-
 
 function rgeFormatearPrecio(valor) {
     return "$" + Number(valor).toFixed(2);
@@ -185,6 +278,17 @@ function rgeCalcularTotales(carrito) {
     };
 }
 
+async function rgeCalcularTotalesServidor(carrito) {
+    const items = carrito.map(function (item) {
+        return {
+            id_producto_talla: item.id_producto_talla,
+            cantidad: item.cantidad
+        };
+    });
+
+    return await rgeApi("/pedidos/calcular", { cuerpo: { items: items } });
+}
+
 const RGE_REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function rgeEmailValido(email) {
@@ -193,6 +297,7 @@ function rgeEmailValido(email) {
 
 function rgeNotificar(mensaje, tipo) {
     const anterior = document.querySelector(".notificacion");
+
     if (anterior) {
         anterior.remove();
     }
@@ -216,6 +321,6 @@ function rgeNotificar(mensaje, tipo) {
 
 document.addEventListener("DOMContentLoaded", function () {
     rgeActualizarContador();
-    rgeAplicarEstadoSesion();
     rgeIniciarMenuUsuario();
+    rgeCargarSesion();
 });

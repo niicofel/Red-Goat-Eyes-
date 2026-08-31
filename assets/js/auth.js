@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
 
     const formLogin    = document.getElementById("loginForm");
     const formRegistro = document.getElementById("registroForm");
@@ -24,13 +24,20 @@ document.addEventListener("DOMContentLoaded", function () {
         avisoCheckout.classList.remove("oculto");
     }
 
+    const selectCiudad = document.getElementById("reg-ciudad");
+    if (selectCiudad) {
+        await cargarCiudades(selectCiudad);
+    }
+
     if (formLogin) {
-        formLogin.addEventListener("submit", function (event) {
-            event.preventDefault();
+        formLogin.addEventListener("submit", async function (evento) {
+            evento.preventDefault();
+
+            const email    = document.getElementById("login-email");
+            const password = document.getElementById("login-password");
 
             let valido = true;
 
-            const email = document.getElementById("login-email");
             if (!rgeEmailValido(email.value)) {
                 mostrarError(email, "Ingrese un correo válido.");
                 valido = false;
@@ -38,7 +45,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 limpiarError(email);
             }
 
-            const password = document.getElementById("login-password");
             if (password.value.trim() === "") {
                 mostrarError(password, "Ingrese su contraseña.");
                 valido = false;
@@ -50,25 +56,40 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            const usuario = rgeBuscarUsuario(email.value.trim());
+            const boton = formLogin.querySelector('button[type="submit"]');
+            bloquear(boton, "Ingresando...");
 
-            if (!usuario) {
-                mostrarError(email, "No existe una cuenta con este correo. Cree una cuenta.");
-                return;
+            try {
+                const datos = await rgeApi("/auth/login", {
+                    cuerpo: {
+                        email: email.value.trim(),
+                        password: password.value
+                    }
+                });
+
+                rgeNotificar("Bienvenido de nuevo, " + datos.usuario.nombres, "exito");
+
+                setTimeout(function () {
+                    window.location.href = datos.usuario.rol === "administrador"
+                        ? "admin.html"
+                        : destino;
+                }, 900);
+
+            } catch (error) {
+                desbloquear(boton, "Iniciar sesión");
+
+                if (error.codigo === "CREDENCIALES_INVALIDAS") {
+                    mostrarError(password, "El correo o la contraseña no son correctos.");
+                } else {
+                    mostrarError(email, error.mensaje);
+                }
             }
-
-            rgeAbrirSesion(usuario);
-            rgeNotificar("Bienvenido de nuevo, " + usuario.nombres, "exito");
-
-            setTimeout(function () {
-                window.location.href = destino;
-            }, 900);
         });
     }
 
     if (formRegistro) {
-        formRegistro.addEventListener("submit", function (event) {
-            event.preventDefault();
+        formRegistro.addEventListener("submit", async function (evento) {
+            evento.preventDefault();
 
             let valido = true;
 
@@ -100,9 +121,6 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!rgeEmailValido(email.value)) {
                 mostrarError(email, "Ingrese un correo válido. Aquí recibirá su recibo.");
                 valido = false;
-            } else if (rgeBuscarUsuario(email.value.trim())) {
-                mostrarError(email, "Ya existe una cuenta con este correo.");
-                valido = false;
             } else {
                 limpiarError(email);
             }
@@ -127,32 +145,105 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            const nuevoUsuario = {
-                nombres:   nombres.value.trim(),
-                apellidos: apellidos.value.trim(),
-                cedula:    cedula.value.trim(),
-                email:     email.value.trim(),
-                telefono:  document.getElementById("reg-telefono").value.trim(),
-                id_ciudad: ciudad.value,
-                ciudad:    ciudad.options[ciudad.selectedIndex].text.trim()
-            };
+            const boton = formRegistro.querySelector('button[type="submit"]');
+            bloquear(boton, "Creando cuenta...");
 
-            if (!rgeRegistrarUsuario(nuevoUsuario)) {
-                mostrarError(email, "Ya existe una cuenta con este correo.");
-                return;
+            try {
+                const datos = await rgeApi("/auth/registro", {
+                    cuerpo: {
+                        nombres:   nombres.value.trim(),
+                        apellidos: apellidos.value.trim(),
+                        cedula:    cedula.value.trim(),
+                        email:     email.value.trim(),
+                        telefono:  document.getElementById("reg-telefono").value.trim(),
+                        id_ciudad: parseInt(ciudad.value, 10),
+                        password:  password.value
+                    }
+                });
+
+                rgeNotificar("Cuenta creada. Bienvenido, " + datos.usuario.nombres, "exito");
+
+                setTimeout(function () {
+                    window.location.href = destino;
+                }, 900);
+
+            } catch (error) {
+                desbloquear(boton, "Crear cuenta");
+                mostrarErrorPorCampo(error);
             }
-
-            rgeAbrirSesion(nuevoUsuario);
-            rgeNotificar("Cuenta creada. Bienvenido, " + nuevoUsuario.nombres, "exito");
-
-            setTimeout(function () {
-                window.location.href = destino;
-            }, 900);
         });
     }
 
+    async function cargarCiudades(select) {
+        try {
+            const datos = await rgeApi("/ciudades");
+
+            select.textContent = "";
+
+            const inicial = document.createElement("option");
+            inicial.value = "";
+            inicial.textContent = "Seleccione una ciudad";
+            select.appendChild(inicial);
+
+            datos.ciudades.forEach(function (ciudad) {
+                const opcion = document.createElement("option");
+                opcion.value = ciudad.id_ciudad;
+                opcion.textContent = ciudad.nombre + " (" + ciudad.provincia + ")";
+                select.appendChild(opcion);
+            });
+
+        } catch (error) {
+            rgeNotificar(error.mensaje, "aviso");
+        }
+    }
+
+    function mostrarErrorPorCampo(error) {
+        const mapa = {
+            email: "reg-email",
+            password: "reg-password",
+            cedula: "reg-cedula",
+            nombres: "reg-nombres",
+            apellidos: "reg-apellidos",
+            telefono: "reg-telefono",
+            id_ciudad: "reg-ciudad"
+        };
+
+        if (error.codigo === "USUARIO_DUPLICADO") {
+            mostrarError(document.getElementById("reg-email"),
+                "Ya existe una cuenta con este correo.");
+            return;
+        }
+
+        const destinoCampo = mapa[error.campo];
+
+        if (destinoCampo) {
+            mostrarError(document.getElementById(destinoCampo), error.mensaje);
+        } else {
+            rgeNotificar(error.mensaje, "aviso");
+        }
+    }
+
+    function bloquear(boton, texto) {
+        if (boton) {
+            boton.disabled = true;
+            boton.dataset.textoOriginal = boton.textContent;
+            boton.textContent = texto;
+        }
+    }
+
+    function desbloquear(boton, texto) {
+        if (boton) {
+            boton.disabled = false;
+            boton.textContent = boton.dataset.textoOriginal || texto;
+        }
+    }
 
     function mostrarError(elemento, mensaje) {
+        if (!elemento) {
+            rgeNotificar(mensaje, "aviso");
+            return;
+        }
+
         const grupo = elemento.parentElement;
         const errorDisplay = grupo.querySelector(".error");
 
