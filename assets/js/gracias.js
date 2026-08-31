@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
 
     const cuerpo = document.querySelector("#tabla-pedido tbody");
     const codigo = document.getElementById("codigo-pedido");
@@ -7,45 +7,49 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    let pedido = null;
+    await rgeCargarSesion();
 
-    try {
-        const datos = localStorage.getItem(RGE_CLAVE_PEDIDO);
-        pedido = datos ? JSON.parse(datos) : null;
-    } catch (error) {
-        console.error("No se pudo leer el pedido:", error);
+    const codigoPedido = localStorage.getItem(RGE_CLAVE_PEDIDO);
+
+    if (!codigoPedido) {
+        mostrarSinPedido("No hay ningun pedido reciente para mostrar.");
+        return;
     }
 
-    if (!pedido || !Array.isArray(pedido.items) || pedido.items.length === 0) {
-        mostrarSinPedido();
+    let pedido;
+
+    try {
+        pedido = await rgeApi("/pedidos/" + encodeURIComponent(codigoPedido));
+    } catch (error) {
+        if (error.codigo === "SIN_SESION") {
+            mostrarSinPedido("Inicia sesion para ver el detalle de tu pedido.");
+        } else {
+            mostrarSinPedido(error.mensaje);
+        }
         return;
     }
 
     if (codigo) {
-        codigo.textContent = pedido.codigo;
+        codigo.textContent = pedido.codigo_pedido;
     }
 
-    if (pedido.cliente) {
-        escribirTexto("gracias-email", pedido.cliente.email);
-        escribirTexto("gracias-cliente", pedido.cliente.nombres + " " + pedido.cliente.apellidos);
-    }
-
+    escribirTexto("gracias-email", pedido.email);
+    escribirTexto("gracias-cliente", pedido.cliente);
     escribirTexto("gracias-metodo", pedido.metodo_pago || "No especificado");
 
-    if (pedido.entrega) {
-        const direccion = pedido.entrega.referencia
-            ? pedido.entrega.direccion + " (" + pedido.entrega.referencia + ")"
-            : pedido.entrega.direccion;
-        escribirTexto("gracias-direccion", direccion);
-    }
+    const direccion = pedido.referencia
+        ? pedido.direccion + " (" + pedido.referencia + ")"
+        : pedido.direccion;
 
-    pedido.items.forEach(function (item) {
+    escribirTexto("gracias-direccion", direccion);
+
+    pedido.detalles.forEach(function (linea) {
         const fila = document.createElement("tr");
 
-        fila.appendChild(crearCelda(item.nombre));
-        fila.appendChild(crearCelda(item.cantidad));
-        fila.appendChild(crearCelda(rgeFormatearPrecio(item.precio)));
-        fila.appendChild(crearCelda(rgeFormatearPrecio(item.precio * item.cantidad)));
+        fila.appendChild(crearCelda(linea.producto));
+        fila.appendChild(crearCelda(linea.cantidad));
+        fila.appendChild(crearCelda(rgeFormatearPrecio(linea.precio_unitario)));
+        fila.appendChild(crearCelda(rgeFormatearPrecio(linea.subtotal_linea)));
 
         cuerpo.appendChild(fila);
     });
@@ -53,7 +57,6 @@ document.addEventListener("DOMContentLoaded", function () {
     escribirTotal("gracias-subtotal", pedido.subtotal);
     escribirTotal("gracias-iva", pedido.iva);
     escribirTotal("gracias-total", pedido.total);
-
 
     function crearCelda(texto) {
         const celda = document.createElement("td");
@@ -63,6 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function escribirTexto(id, texto) {
         const elemento = document.getElementById(id);
+
         if (elemento) {
             elemento.textContent = texto;
         }
@@ -70,18 +74,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function escribirTotal(id, valor) {
         const elemento = document.getElementById(id);
+
         if (elemento) {
             elemento.textContent = rgeFormatearPrecio(valor);
         }
     }
 
-    function mostrarSinPedido() {
+    function mostrarSinPedido(mensaje) {
         const fila  = document.createElement("tr");
         const celda = document.createElement("td");
 
         celda.className = "tabla-vacia";
         celda.colSpan = 4;
-        celda.textContent = "No hay ningun pedido reciente para mostrar.";
+        celda.textContent = mensaje;
 
         fila.appendChild(celda);
         cuerpo.appendChild(fila);

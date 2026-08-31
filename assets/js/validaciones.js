@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
 
     const form = document.getElementById("contactForm");
 
@@ -6,51 +6,175 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    form.addEventListener("submit", function (event) {
-        event.preventDefault();
+    const sesion = await rgeCargarSesion();
 
-        if (validarFormulario()) {
-            rgeNotificar("Formulario enviado con exito", "exito");
+    let selectCiudad = null;
+
+    await cargarAsuntos();
+    selectCiudad = await construirSelectCiudades();
+
+    if (sesion) {
+        const nombre = document.getElementById("nombre");
+        const email  = document.getElementById("email");
+
+        if (nombre && !nombre.value) {
+            nombre.value = sesion.nombre;
+        }
+        if (email && !email.value) {
+            email.value = sesion.email;
+        }
+    }
+
+    form.addEventListener("submit", async function (evento) {
+        evento.preventDefault();
+
+        if (!validarFormulario()) {
+            return;
+        }
+
+        const boton = form.querySelector('button[type="submit"]');
+        const textoOriginal = boton ? boton.textContent : "";
+
+        if (boton) {
+            boton.disabled = true;
+            boton.textContent = "Enviando...";
+        }
+
+        try {
+            await rgeApi("/contacto", {
+                cuerpo: {
+                    nombre: document.getElementById("nombre").value.trim(),
+                    email: document.getElementById("email").value.trim(),
+                    asunto: document.getElementById("asunto").value,
+                    id_ciudad: parseInt(selectCiudad.value, 10),
+                    descripcion: document.getElementById("descripcion").value.trim()
+                }
+            });
+
+            rgeNotificar("Mensaje enviado con exito. Te responderemos pronto.", "exito");
             form.reset();
 
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            document.querySelectorAll(".error-input").forEach(function (elemento) {
+                elemento.classList.remove("error-input");
+            });
+            document.querySelectorAll(".error").forEach(function (elemento) {
+                elemento.textContent = "";
             });
 
-            document.querySelectorAll(".error-input").forEach(function (el) {
-                el.classList.remove("error-input");
-            });
-            document.querySelectorAll(".error").forEach(function (el) {
-                el.textContent = "";
-            });
+        } catch (error) {
+            const mapa = {
+                nombre: "nombre",
+                email: "email",
+                asunto: "asunto",
+                descripcion: "descripcion",
+                id_ciudad: "ciudad"
+            };
+
+            const destino = mapa[error.campo];
+
+            if (destino) {
+                mostrarError(document.getElementById(destino), error.mensaje);
+            } else {
+                rgeNotificar(error.mensaje, "aviso");
+            }
+
+        } finally {
+            if (boton) {
+                boton.disabled = false;
+                boton.textContent = textoOriginal;
+            }
         }
     });
 
+    async function cargarAsuntos() {
+        const select = document.getElementById("asunto");
+
+        if (!select) {
+            return;
+        }
+
+        try {
+            const datos = await rgeApi("/contacto/asuntos");
+
+            select.textContent = "";
+
+            const inicial = document.createElement("option");
+            inicial.value = "";
+            inicial.textContent = "Seleccione un asunto";
+            select.appendChild(inicial);
+
+            datos.asuntos.forEach(function (asunto) {
+                const opcion = document.createElement("option");
+                opcion.value = asunto.nombre;
+                opcion.textContent = asunto.nombre;
+                select.appendChild(opcion);
+            });
+
+        } catch (error) {
+            rgeNotificar(error.mensaje, "aviso");
+        }
+    }
+
+    async function construirSelectCiudades() {
+        const original = document.getElementById("ciudad");
+
+        if (!original) {
+            return null;
+        }
+
+        const select = document.createElement("select");
+        select.id = original.id;
+        select.name = original.name;
+        select.required = original.required;
+
+        const inicial = document.createElement("option");
+        inicial.value = "";
+        inicial.textContent = "Seleccione una ciudad";
+        select.appendChild(inicial);
+
+        try {
+            const datos = await rgeApi("/ciudades");
+
+            datos.ciudades.forEach(function (ciudad) {
+                const opcion = document.createElement("option");
+                opcion.value = ciudad.id_ciudad;
+                opcion.textContent = ciudad.nombre + " (" + ciudad.provincia + ")";
+                select.appendChild(opcion);
+            });
+
+        } catch (error) {
+            rgeNotificar(error.mensaje, "aviso");
+        }
+
+        original.parentElement.replaceChild(select, original);
+        return select;
+    }
+
     function validarFormulario() {
-        let itsValid = true;
+        let esValido = true;
 
         const nombre = document.getElementById("nombre");
         if (nombre.value.trim().length < 3) {
             mostrarError(nombre, "El nombre tiene que tener al menos 3 caracteres.");
-            itsValid = false;
+            esValido = false;
         } else {
             limpiarError(nombre);
         }
 
         const ciudad = document.getElementById("ciudad");
-        if (ciudad.value.trim() === "") {
-            mostrarError(ciudad, "El campo es obligatorio.");
-            itsValid = false;
+        if (!ciudad || ciudad.value === "") {
+            mostrarError(ciudad, "Seleccione una ciudad.");
+            esValido = false;
         } else {
             limpiarError(ciudad);
         }
 
         const email = document.getElementById("email");
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email.value)) {
+        if (!rgeEmailValido(email.value)) {
             mostrarError(email, "Ingrese un correo válido.");
-            itsValid = false;
+            esValido = false;
         } else {
             limpiarError(email);
         }
@@ -58,7 +182,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const asunto = document.getElementById("asunto");
         if (asunto.value === "") {
             mostrarError(asunto, "Seleccione un asunto.");
-            itsValid = false;
+            esValido = false;
         } else {
             limpiarError(asunto);
         }
@@ -66,7 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const descripcion = document.getElementById("descripcion");
         if (descripcion.value.trim().length < 10) {
             mostrarError(descripcion, "Mensaje muy corto. Ingrese minimo 10 caracteres.");
-            itsValid = false;
+            esValido = false;
         } else {
             limpiarError(descripcion);
         }
@@ -81,17 +205,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (tiposPermitidos.indexOf(archivo.type) === -1) {
                 mostrarError(foto, "Solo se permiten imagenes PNG, JPG o WEBP.");
-                itsValid = false;
+                esValido = false;
             } else if (archivo.size > pesoMaximo) {
                 mostrarError(foto, "La imagen no puede pesar mas de 2 MB.");
-                itsValid = false;
+                esValido = false;
             }
         }
 
-        return itsValid;
+        return esValido;
     }
 
     function mostrarError(elemento, mensaje) {
+        if (!elemento) {
+            rgeNotificar(mensaje, "aviso");
+            return;
+        }
+
         const grupo = elemento.parentElement;
         const errorDisplay = grupo.querySelector(".error");
 
@@ -102,6 +231,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function limpiarError(elemento) {
+        if (!elemento) {
+            return;
+        }
+
         const grupo = elemento.parentElement;
         const errorDisplay = grupo.querySelector(".error");
 

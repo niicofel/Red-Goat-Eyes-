@@ -1,21 +1,23 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
 
-    const contenedor  = document.getElementById("carrito-items");
-    const vacio       = document.getElementById("carrito-vacio");
-    const botonPagar  = document.getElementById("btn-continuar");
-    const avisoLogin  = document.getElementById("aviso-login");
+    const contenedor = document.getElementById("carrito-items");
+    const vacio      = document.getElementById("carrito-vacio");
+    const botonPagar = document.getElementById("btn-continuar");
+    const avisoLogin = document.getElementById("aviso-login");
 
     if (!contenedor) {
         return;
     }
 
-    pintarCarrito();
+    await rgeCargarSesion();
+    await rgeSincronizarCarrito();
+    await pintarCarrito();
 
     if (botonPagar) {
         botonPagar.addEventListener("click", continuarAlPago);
     }
 
-    function pintarCarrito() {
+    async function pintarCarrito() {
         const carrito = rgeLeerCarrito();
         contenedor.textContent = "";
 
@@ -47,7 +49,16 @@ document.addEventListener("DOMContentLoaded", function () {
             contenedor.appendChild(crearFila(item));
         });
 
-        actualizarResumen(rgeCalcularTotales(carrito));
+        try {
+            const totales = await rgeCalcularTotalesServidor(carrito);
+            actualizarResumen(totales);
+        } catch (error) {
+            actualizarResumen(rgeCalcularTotales(carrito));
+
+            if (error.codigo === "STOCK_INSUFICIENTE") {
+                rgeNotificar(error.mensaje, "aviso");
+            }
+        }
     }
 
     function crearFila(item) {
@@ -89,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
         menos.textContent = "-";
         menos.setAttribute("aria-label", "Quitar una unidad");
         menos.addEventListener("click", function () {
-            cambiarCantidad(item.id, -1);
+            cambiarCantidad(item.codigo, -1);
         });
 
         const cantidad = document.createElement("span");
@@ -100,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
         mas.textContent = "+";
         mas.setAttribute("aria-label", "Agregar una unidad");
         mas.addEventListener("click", function () {
-            cambiarCantidad(item.id, 1);
+            cambiarCantidad(item.codigo, 1);
         });
 
         control.appendChild(menos);
@@ -112,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
         eliminar.className = "btn-eliminar";
         eliminar.textContent = "Eliminar";
         eliminar.addEventListener("click", function () {
-            eliminarItem(item.id);
+            eliminarItem(item.codigo);
         });
 
         acciones.appendChild(control);
@@ -125,39 +136,50 @@ document.addEventListener("DOMContentLoaded", function () {
         return fila;
     }
 
-    function cambiarCantidad(id, cambio) {
+    async function cambiarCantidad(codigo, cambio) {
         const carrito = rgeLeerCarrito();
 
         const item = carrito.find(function (producto) {
-            return producto.id === id;
+            return producto.codigo === codigo;
         });
 
         if (!item) {
             return;
         }
 
-        item.cantidad = item.cantidad + cambio;
+        const nueva = item.cantidad + cambio;
 
-        if (item.cantidad <= 0) {
-            const filtrado = carrito.filter(function (producto) {
-                return producto.id !== id;
-            });
-            rgeGuardarCarrito(filtrado);
-        } else {
-            rgeGuardarCarrito(carrito);
+        if (nueva <= 0) {
+            eliminarItem(codigo);
+            return;
         }
 
-        pintarCarrito();
+        try {
+            const respuesta = await rgeApi("/productos/disponibilidad/" +
+                item.id_producto_talla + "?cantidad=" + nueva);
+
+            if (!respuesta.disponible) {
+                rgeNotificar("No hay mas unidades disponibles de " + item.nombre, "aviso");
+                return;
+            }
+        } catch (error) {
+            rgeNotificar(error.mensaje, "aviso");
+            return;
+        }
+
+        item.cantidad = nueva;
+        rgeGuardarCarrito(carrito);
+        await pintarCarrito();
     }
 
-    function eliminarItem(id) {
+    async function eliminarItem(codigo) {
         const carrito = rgeLeerCarrito().filter(function (producto) {
-            return producto.id !== id;
+            return producto.codigo !== codigo;
         });
 
         rgeGuardarCarrito(carrito);
         rgeNotificar("Producto eliminado del carrito", "aviso");
-        pintarCarrito();
+        await pintarCarrito();
     }
 
     function actualizarResumen(totales) {
