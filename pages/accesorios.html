@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+
+<!-- ============================================================
+     ACCESORIOS.HTML
+     Catalogo de accesorios
+     ============================================================ -->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -7,6 +12,9 @@
     <meta name="description" content=" Gorras, collares y cadenas urbanas ">
     <meta name="keywords" content=" ropa urbana, unisex, ecuador - quito, streetwear ">
     <link rel="icon" type="image/png" href="../assets/img/icons/RedGoatEyesIcon.png">
+
+    <!-- ---------------- Hojas de estilo ---------------- -->
+    <!-- El orden importa: responsive va al final para poder sobrescribir -->
     <link rel="stylesheet" href="../assets/css/base.css">
     <link rel="stylesheet" href="../assets/css/layout.css">
     <link rel="stylesheet" href="../assets/css/components.css">
@@ -18,8 +26,13 @@
 </head>
 <body>
 
+
+    <!-- ---------------- Cabecera ---------------- -->
+    <!-- Se repite igual en las 13 paginas -->
     <header class="site-header">
 
+
+        <!-- ---------------- Barra superior de ubicacion ---------------- -->
         <div class="top-bar">
             <div class="location">
                 <i class="fa-solid fa-location-dot"></i>
@@ -27,6 +40,8 @@
             </div>
         </div>
 
+
+        <!-- ---------------- Barra de navegacion ---------------- -->
         <nav class="navbar">
             <div class="logo">
                 <a href="../index.html">
@@ -34,10 +49,15 @@
                 </a>
             </div>
 
+
+            <!-- ---------------- Boton hamburguesa ---------------- -->
+            <!-- Solo se ve en pantallas menores a 768px -->
             <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
                 <i class="fa-solid fa-bars"></i>
             </button>
 
+
+            <!-- ---------------- Enlaces del menu ---------------- -->
             <ul class="nav-links" id="nav-links">
                 <li><a href="../index.html"> Inicio </a></li>
 
@@ -54,6 +74,8 @@
                 <li><a href="contacto.html"> Contacto </a></li>
             </ul>
 
+
+            <!-- ---------------- Iconos de carrito y usuario ---------------- -->
             <div class="nav-icons">
                 <a href="carrito.html" class="icono-carrito" aria-label="Ver carrito">
                     <i class="fa-solid fa-cart-shopping"></i>
@@ -65,6 +87,9 @@
                         <i class="fa-regular fa-user"></i>
                     </button>
 
+
+                    <!-- ---------------- Menu desplegable del usuario ---------------- -->
+                    <!-- Las clases solo-invitado y solo-cliente las controla el JavaScript segun la sesion -->
                     <ul class="usuario-dropdown" id="usuario-dropdown">
                         <li class="usuario-saludo solo-cliente" id="usuario-saludo"></li>
                         <li class="solo-invitado"><a href="login.html"> Iniciar sesión </a></li>
@@ -82,10 +107,15 @@
 
     <main>
 
+
+        <!-- ---------------- Catalogo de accesorios ---------------- -->
+        <!-- Los accesorios son de talla unica -->
         <section class="catalogo">
 
             <div class="cards-container">
 
+
+                <!-- ---------------- Tarjeta de producto ---------------- -->
                 <article class="card"
                          data-id="RGE-ACC-001"
                          data-nombre="Gorro Alas de Espolón Óseo"
@@ -267,6 +297,8 @@
 
     </main>
 
+
+    <!-- ---------------- Pie de pagina ---------------- -->
     <footer class="footer">
 
         <div class="footer-top">
@@ -279,6 +311,9 @@
 
     </footer>
 
+
+    <!-- ---------------- Scripts ---------------- -->
+    <!-- carrito-contador va primero porque los demas usan sus funciones -->
     <script src="../assets/js/carrito-contador.js"></script>
     <script src="../assets/js/menu.js"></script>
     <script src="../assets/js/catalogo.js"></script>
