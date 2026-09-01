@@ -89,12 +89,16 @@
             <div class="admin-tabs">
                 <button type="button" class="tab-btn activa" data-tab="reportes"> Reportes </button>
                 <button type="button" class="tab-btn" data-tab="productos"> Productos </button>
+                <button type="button" class="tab-btn" data-tab="inventario"> Inventario </button>
                 <button type="button" class="tab-btn" data-tab="pedidos"> Pedidos </button>
                 <button type="button" class="tab-btn" data-tab="mensajes"> Mensajes </button>
             </div>
         </section>
 
         <section id="tab-reportes" class="admin-panel">
+
+            <div id="resumen-admin" class="kpi-grid"></div>
+
 
             <article class="reporte">
                 <h2> Reporte 1: Ventas por categoría </h2>
@@ -172,6 +176,75 @@
             </article>
         </section>
 
+        <section id="tab-inventario" class="admin-panel oculto">
+
+            <article class="admin-bloque">
+                <h2> Reposicion de stock </h2>
+                <p class="admin-ayuda">
+                    Registra la entrada de mercaderia. La operacion queda auditada
+                    con el administrador que la realizo.
+                </p>
+
+                <form id="form-reponer" class="form-reponer" novalidate>
+                    <div class="form-group">
+                        <label for="reponer-codigo"> Codigo del producto </label>
+                        <input type="text" id="reponer-codigo" name="codigo_producto"
+                               placeholder="RGE-HOO-001" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reponer-talla"> Talla </label>
+                        <input type="text" id="reponer-talla" name="codigo_talla"
+                               placeholder="M" maxlength="3" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reponer-cantidad"> Unidades a agregar </label>
+                        <input type="number" id="reponer-cantidad" name="cantidad"
+                               min="1" max="1000" value="10" required>
+                    </div>
+
+                    <button type="submit"> Reponer stock </button>
+                </form>
+
+                <p id="reponer-aviso" class="reponer-aviso"></p>
+            </article>
+
+            <article class="admin-bloque">
+                <h2> Inventario por talla </h2>
+
+                <div class="admin-filtros">
+                    <label for="filtro-inventario"> Mostrar </label>
+                    <select id="filtro-inventario">
+                        <option value="todos"> Todo el inventario </option>
+                        <option value="criticos"> Solo nivel critico </option>
+                        <option value="agotados"> Solo agotados </option>
+                    </select>
+                    <span id="inventario-contador" class="admin-contador"></span>
+                </div>
+
+                <div class="tabla-scroll">
+                    <table id="tabla-inventario">
+                        <thead>
+                            <tr>
+                                <th> Codigo </th>
+                                <th> Producto </th>
+                                <th> Categoria </th>
+                                <th> Talla </th>
+                                <th> Stock </th>
+                                <th> Minimo </th>
+                                <th> Estado </th>
+                                <th> Accion </th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </article>
+
+        </section>
+
+
         <section id="tab-pedidos" class="admin-panel oculto">
             <article class="reporte">
                 <h2> Gestión de pedidos </h2>
@@ -201,6 +274,7 @@
                             <tr>
                                 <th> Fecha </th>
                                 <th> Nombre </th>
+                                <th> Correo </th>
                                 <th> Ciudad </th>
                                 <th> Asunto </th>
                                 <th> Estado </th>

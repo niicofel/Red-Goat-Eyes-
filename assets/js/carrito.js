@@ -50,8 +50,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
 
         try {
-            const totales = await rgeCalcularTotalesServidor(carrito);
-            actualizarResumen(totales);
+            actualizarResumen(await rgeCalcularTotalesServidor(carrito));
         } catch (error) {
             actualizarResumen(rgeCalcularTotales(carrito));
 
@@ -79,7 +78,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const categoria = document.createElement("p");
         categoria.className = "carrito-item-categoria";
-        categoria.textContent = item.categoria;
+        categoria.textContent = item.talla
+            ? item.categoria + "  ·  Talla " + item.talla
+            : item.categoria;
 
         const precio = document.createElement("p");
         precio.className = "carrito-item-precio";
@@ -100,7 +101,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         menos.textContent = "-";
         menos.setAttribute("aria-label", "Quitar una unidad");
         menos.addEventListener("click", function () {
-            cambiarCantidad(item.codigo, -1);
+            cambiarCantidad(item.id_producto_talla, -1);
         });
 
         const cantidad = document.createElement("span");
@@ -111,7 +112,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         mas.textContent = "+";
         mas.setAttribute("aria-label", "Agregar una unidad");
         mas.addEventListener("click", function () {
-            cambiarCantidad(item.codigo, 1);
+            cambiarCantidad(item.id_producto_talla, 1);
         });
 
         control.appendChild(menos);
@@ -123,7 +124,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         eliminar.className = "btn-eliminar";
         eliminar.textContent = "Eliminar";
         eliminar.addEventListener("click", function () {
-            eliminarItem(item.codigo);
+            eliminarItem(item.id_producto_talla);
         });
 
         acciones.appendChild(control);
@@ -136,11 +137,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         return fila;
     }
 
-    async function cambiarCantidad(codigo, cambio) {
+    async function cambiarCantidad(idProductoTalla, cambio) {
         const carrito = rgeLeerCarrito();
 
         const item = carrito.find(function (producto) {
-            return producto.codigo === codigo;
+            return producto.id_producto_talla === idProductoTalla;
         });
 
         if (!item) {
@@ -150,16 +151,17 @@ document.addEventListener("DOMContentLoaded", async function () {
         const nueva = item.cantidad + cambio;
 
         if (nueva <= 0) {
-            eliminarItem(codigo);
+            eliminarItem(idProductoTalla);
             return;
         }
 
         try {
             const respuesta = await rgeApi("/productos/disponibilidad/" +
-                item.id_producto_talla + "?cantidad=" + nueva);
+                idProductoTalla + "?cantidad=" + nueva);
 
             if (!respuesta.disponible) {
-                rgeNotificar("No hay mas unidades disponibles de " + item.nombre, "aviso");
+                rgeNotificar("No hay mas unidades disponibles de " + item.nombre +
+                             (item.talla ? " talla " + item.talla : ""), "aviso");
                 return;
             }
         } catch (error) {
@@ -172,9 +174,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         await pintarCarrito();
     }
 
-    async function eliminarItem(codigo) {
+    async function eliminarItem(idProductoTalla) {
         const carrito = rgeLeerCarrito().filter(function (producto) {
-            return producto.codigo !== codigo;
+            return producto.id_producto_talla !== idProductoTalla;
         });
 
         rgeGuardarCarrito(carrito);

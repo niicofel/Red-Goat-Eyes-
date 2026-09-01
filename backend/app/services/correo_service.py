@@ -203,6 +203,87 @@ font-family:Arial,Helvetica,sans-serif;color:#111">
             resumen["detalles"].append(f"{codigo} fallo: {detalle}")
             log.error("Fallo el envio de %s: %s", codigo, detalle)
 
+        def notificar_mensaje_contacto(self, datos):
+            if not self.configurado:
+                log.warning("SMTP sin configurar: no se avisa del mensaje de contacto")
+                return False
+
+            destino = Config.SMTP_USUARIO
+
+            mensaje = EmailMessage()
+            mensaje["From"] = Config.SMTP_REMITENTE or Config.SMTP_USUARIO
+            mensaje["To"] = destino
+            mensaje["Reply-To"] = datos["email"]
+            mensaje["Subject"] = "[Contacto] " + datos["asunto"] + " - " + datos["nombre"]
+
+            mensaje.set_content(
+                "Nuevo mensaje desde el formulario de contacto.\n\n"
+                "Nombre : " + datos["nombre"] + "\n"
+                "Correo : " + datos["email"] + "\n"
+                "Ciudad : " + datos["ciudad"] + "\n"
+                "Asunto : " + datos["asunto"] + "\n\n"
+                "Mensaje:\n" + datos["descripcion"] + "\n\n"
+                "Puedes responder directamente a este correo.\n")
+
+            mensaje.add_alternative(self._html_contacto(datos), subtype="html")
+
+            try:
+                servidor = self._conectar()
+            except Exception as error:
+                log.error("No se pudo avisar del mensaje de contacto: %s", error)
+                return False
+
+            try:
+                servidor.send_message(mensaje)
+                log.info("Aviso de contacto enviado a %s", destino)
+                return True
+            except Exception as error:
+                log.error("Fallo el aviso de contacto: %s", error)
+                return False
+            finally:
+                try:
+                    servidor.quit()
+                except Exception:
+                    pass
+
+        @staticmethod
+        def _html_contacto(datos):
+            return f"""<html><body style="margin:0;padding:24px;background:#f5f5f5;
+    font-family:Arial,Helvetica,sans-serif;color:#111">
+    <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden">
+    <div style="background:#111;padding:20px">
+        <h1 style="margin:0;color:#fff;font-size:18px;letter-spacing:1px">MENSAJE DE CONTACTO</h1>
+        <p style="margin:4px 0 0;color:#c81e1e;font-size:12px">Red Goat Eyes</p>
+    </div>
+    <div style="padding:24px">
+        <table style="width:100%;font-size:14px;border-collapse:collapse">
+        <tr><td style="padding:6px 0;color:#666;width:90px"><strong>Nombre</strong></td>
+            <td style="padding:6px 0">{datos["nombre"]}</td></tr>
+        <tr><td style="padding:6px 0;color:#666"><strong>Correo</strong></td>
+            <td style="padding:6px 0">{datos["email"]}</td></tr>
+        <tr><td style="padding:6px 0;color:#666"><strong>Ciudad</strong></td>
+            <td style="padding:6px 0">{datos["ciudad"]}</td></tr>
+        <tr><td style="padding:6px 0;color:#666"><strong>Asunto</strong></td>
+            <td style="padding:6px 0">{datos["asunto"]}</td></tr>
+        </table>
+        <div style="margin-top:18px;padding:16px;background:#f9f9f9;border-left:3px solid #c81e1e;
+                    border-radius:4px;font-size:14px;line-height:1.6;white-space:pre-wrap">{datos["descripcion"]}</div>
+        <p style="margin:20px 0 0;font-size:12px;color:#666">
+        Responde a este correo para contestarle directamente al cliente.
+        </p>
+    </div>
+    </div>
+    </body></html>"""
+
+        def notificar_contacto_en_segundo_plano(self, datos):
+            if not self.configurado:
+                return False
+
+            hilo = threading.Thread(target=self.notificar_mensaje_contacto,
+                                    args=(datos,), daemon=True)
+            hilo.start()
+            return True
+
     def enviar_pendientes_en_segundo_plano(self, limite=20):
         if not self.configurado:
             log.warning("SMTP sin configurar: el recibo queda en cola")

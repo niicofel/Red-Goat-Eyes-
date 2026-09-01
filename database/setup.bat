@@ -48,18 +48,20 @@ echo.
 set /p PGPASSWORD=Contrasena de PostgreSQL para %PGUSER%: 
 echo.
 
-echo [1/8] Creando la base de datos...
+echo [1/10] Creando la base de datos...
 psql -h %PGHOST% -p %PGPORT% -U %PGUSER% -d postgres -f "00_create_database.sql"
-echo       Si aparecio el error 42P04, la base ya existia. Continuamos.
+echo        Si aparecio el error 42P04, la base ya existia. Continuamos.
 echo.
 
-call :ejecutar "01_schema.sql"              "2/8" "Creando las 21 tablas"
-call :ejecutar "02_seed.sql"                "3/8" "Cargando catalogos y productos"
-call :ejecutar "03_functions_triggers.sql"  "4/8" "Creando funciones y triggers"
-call :ejecutar "04_procedures.sql"          "5/8" "Creando procedimientos almacenados"
-call :ejecutar "05_views_reportes.sql"      "6/8" "Creando vistas y reportes"
-call :ejecutar "06_roles_permisos.sql"      "7/8" "Configurando roles y permisos"
-call :ejecutar "07_credenciales.sql"        "8/8" "Asignando contrasenas a los roles"
+call :ejecutar "01_schema.sql"              "2/10"  "Creando las 21 tablas"
+call :ejecutar "02_seed.sql"                "3/10"  "Cargando catalogos y productos"
+call :ejecutar "03_functions_triggers.sql"  "4/10"  "Creando funciones y triggers"
+call :ejecutar "04_procedures.sql"          "5/10"  "Creando procedimientos almacenados"
+call :ejecutar "05_views_reportes.sql"      "6/10"  "Creando vistas y reportes"
+call :ejecutar "06_roles_permisos.sql"      "7/10"  "Configurando roles y permisos"
+call :ejecutar "07_credenciales.sql"        "8/10"  "Asignando contrasenas a los roles"
+call :ejecutar "08_security_definer.sql"    "9/10"  "Elevando privilegios de triggers y procedimientos"
+call :ejecutar "09_datos_demo.sql"          "10/10" "Preparando el catalogo por tallas"
 
 echo.
 echo ============================================================
@@ -68,6 +70,12 @@ echo ============================================================
 echo.
 echo Verifica en pgAdmin que existe la base %PGDATABASE_DESTINO%
 echo con sus 21 tablas dentro de Schemas ^> public ^> Tables
+echo.
+echo Comprueba tambien:
+echo    SELECT COUNT(*) FROM v_catalogo_publico;   -- deben ser 24
+echo    SELECT COUNT(*) FROM producto_talla;       -- deben ser 72
+echo.
+echo Cuenta de administrador:  fc762798@gmail.com  /  1234
 echo.
 echo No olvides crear backend\.env con las mismas contrasenas
 echo que pusiste en 07_credenciales.sql

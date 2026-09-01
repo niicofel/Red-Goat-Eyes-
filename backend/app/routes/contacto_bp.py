@@ -1,12 +1,14 @@
 from flask import Blueprint, jsonify, request
 
 from app.repositories.mensaje_repository import MensajeRepository
+from app.services.correo_service import CorreoService
 from app.routes.sesion import requiere_admin, usuario_actual
 from app.utils.validadores import (validar_email, validar_entero,
                                    validar_longitud, validar_opcion)
 
 contacto_bp = Blueprint("contacto", __name__, url_prefix="/api/contacto")
 _repo = MensajeRepository()
+_correo = CorreoService()
 
 
 @contacto_bp.get("/asuntos")
@@ -37,4 +39,13 @@ def enviar():
     id_cliente = actual["id_usuario"] if actual and actual["rol"] == "cliente" else None
 
     _repo.registrar(asunto, id_ciudad, nombre, email, descripcion, id_cliente)
+
+    _correo.notificar_contacto_en_segundo_plano({
+        "nombre": nombre,
+        "email": email,
+        "asunto": asunto,
+        "ciudad": _repo.nombre_ciudad(id_ciudad),
+        "descripcion": descripcion,
+    })
+
     return jsonify({"mensaje": "Mensaje enviado"}), 201

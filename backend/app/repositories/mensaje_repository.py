@@ -50,6 +50,12 @@ class MensajeRepository(BaseRepository):
             salida.append(datos)
         return salida
 
+    def nombre_ciudad(self, id_ciudad):
+        fila = self._consultar_uno(
+            "SELECT nombre FROM ciudad WHERE id_ciudad = %s", (id_ciudad,))
+        return fila["nombre"] if fila else ""
+
+
     def obtener_asuntos(self):
         return self._consultar_todos(
             "SELECT id_asunto, nombre FROM asunto_contacto WHERE activo = TRUE ORDER BY id_asunto")

@@ -185,3 +185,63 @@ class ProductoRepository(BaseRepository):
             }
             for f in filas
         ]
+
+    def catalogo_buscar(self, texto):
+        patron = f"%{texto}%"
+        return self._consultar_todos("""
+            SELECT * FROM v_catalogo_publico
+            WHERE  nombre ILIKE %s OR descripcion ILIKE %s OR codigo ILIKE %s
+            ORDER  BY categoria, codigo
+        """, (patron, patron, patron))
+
+    def catalogo_destacados(self, limite=8):
+        return self._consultar_todos("""
+            SELECT * FROM v_catalogo_publico
+            WHERE  destacado = TRUE AND disponible = TRUE
+            ORDER  BY codigo
+            LIMIT  %s
+        """, (limite,))
+
+    def inventario_completo(self):
+        filas = self._consultar_todos("""
+            SELECT p.codigo, p.nombre, c.nombre AS categoria,
+                   t.codigo AS talla, t.orden AS talla_orden,
+                   pt.id_producto_talla, pt.stock, pt.stock_minimo
+            FROM   producto_talla pt
+            JOIN   producto  p ON p.id_producto  = pt.id_producto
+            JOIN   categoria c ON c.id_categoria = p.id_categoria
+            JOIN   talla     t ON t.id_talla     = pt.id_talla
+            WHERE  p.activo = TRUE
+            ORDER  BY p.codigo, t.orden
+        """)
+        return [
+            {
+                "codigo": f["codigo"],
+                "nombre": f["nombre"],
+                "categoria": f["categoria"],
+                "talla": f["talla"],
+                "id_producto_talla": f["id_producto_talla"],
+                "stock": f["stock"],
+                "stock_minimo": f["stock_minimo"],
+                "critico": f["stock"] <= f["stock_minimo"],
+                "agotado": f["stock"] == 0,
+            }
+            for f in filas
+        ]
+
+    def obtener_stock(self, codigo_producto, codigo_talla):
+        fila = self._consultar_uno("""
+            SELECT p.codigo, p.nombre, t.codigo AS talla,
+                   pt.id_producto_talla, pt.stock, pt.stock_minimo
+            FROM   producto_talla pt
+            JOIN   producto p ON p.id_producto = pt.id_producto
+            JOIN   talla    t ON t.id_talla    = pt.id_talla
+            WHERE  p.codigo = %s AND t.codigo = %s
+        """, (codigo_producto, codigo_talla))
+        return dict(fila) if fila else None
+
+    def reponer_stock(self, codigo_producto, codigo_talla, cantidad, id_administrador):
+        from app.database import llamar_procedimiento
+        llamar_procedimiento("sp_reponer_stock",
+                             (codigo_producto, codigo_talla, cantidad, id_administrador))
+        return True
