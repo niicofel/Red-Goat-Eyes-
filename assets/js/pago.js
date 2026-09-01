@@ -1,3 +1,8 @@
+// ============================================================
+// PAGO.JS
+// Solo en pago.html. Comprueba la sesion, arma el resumen,
+// valida el formulario y registra el pedido en la base.
+// ============================================================
 document.addEventListener("DOMContentLoaded", async function () {
 
     const formulario = document.getElementById("pagoForm");
@@ -6,6 +11,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         return;
     }
 
+
+// ---------------- Comprobar que haya sesion ----------------
+// Sin sesion no se puede pagar: manda al login
     const sesion = await rgeCargarSesion();
 
     if (!sesion) {
@@ -16,6 +24,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         return;
     }
 
+
+// ---------------- Comprobar que el carrito no este vacio ----------------
     const carrito = await rgeSincronizarCarrito();
 
     if (carrito.length === 0) {
@@ -32,6 +42,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     campoNombre.value = sesion.nombre;
     campoEmail.value  = sesion.email;
 
+
+// ---------------- Traer los metodos de pago de la base ----------------
     let metodosPago = [];
 
     try {
@@ -53,6 +65,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         await procesarPago();
     });
 
+
+// ---------------- Resumen del pedido ----------------
+// Los totales los calcula el servidor
     async function pintarResumen(items) {
         const contenedor = document.getElementById("pago-items");
         contenedor.textContent = "";
@@ -88,6 +103,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.getElementById("pago-total").textContent    = rgeFormatearPrecio(totales.total);
     }
 
+
+// ---------------- Quitar tildes para comparar ----------------
+// El HTML dice 'Tarjeta de credito' con tilde y la base sin tilde
     function sinTildes(texto) {
         return String(texto)
             .normalize("NFD")
@@ -96,6 +114,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             .toLowerCase();
     }
 
+
+// ---------------- Saber que metodo eligio el usuario ----------------
     function idMetodoSeleccionado() {
         const marcado = document.querySelector('input[name="metodo"]:checked');
 
@@ -110,6 +130,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         return encontrado ? encontrado.id_metodo : null;
     }
 
+
+// ---------------- Validar el formulario ----------------
     function validarPago() {
         let valido = true;
 
@@ -147,6 +169,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         return valido;
     }
 
+
+// ---------------- Registrar el pedido ----------------
+// Manda los items con su id_producto_talla y guarda el codigo del pedido
     async function procesarPago() {
         const boton = formulario.querySelector('button[type="submit"]');
         const textoOriginal = boton ? boton.textContent : "";
@@ -213,6 +238,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+
+// ---------------- Mostrar y limpiar errores ----------------
     function mostrarError(elemento, mensaje) {
         const grupo = elemento.parentElement;
         const errorDisplay = grupo.querySelector(".error");

@@ -1,9 +1,18 @@
+/* ============================================================
+   BASE.CSS
+   Lo primero que se carga: reinicio, colores y tipografia
+   ============================================================ */
+/* ---------------- Reinicio general ---------------- */
+/* Quita margenes y rellenos que el navegador pone por defecto */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+
+/* ---------------- Colores y fuentes de la marca ---------------- */
+/* Variables que se usan en todo el sitio. Cambiarlas aqui cambia todo */
 :root {
     --rojo: #c00000;
     --rojo-oscuro: #900000;
@@ -32,6 +41,8 @@
     --transicion: 0.3s ease;
 }
 
+
+/* ---------------- Cuerpo de la pagina ---------------- */
 body {
     font-family: var(--fuente);
     background-color: var(--blanco);
@@ -39,18 +50,29 @@ body {
     min-height: 100vh;
 }
 
+
+/* ---------------- Contenido principal ---------------- */
 main {
     display: block;
 }
 
+
+/* ---------------- Imagenes ---------------- */
+/* max-width 100% evita que se salgan de su contenedor en el celular */
 img {
     max-width: 100%;
 }
 
+
+/* ---------------- Utilidad para esconder cosas ---------------- */
+/* Lleva !important porque otros archivos definen display despues */
 .oculto {
     display: none !important;
 }
 
+
+/* ---------------- Mostrar u ocultar segun la sesion ---------------- */
+/* El JavaScript pone la clase con-sesion o sin-sesion en el body */
 body.sin-sesion .solo-cliente {
     display: none !important;
 }
@@ -59,6 +81,9 @@ body.con-sesion .solo-invitado {
     display: none !important;
 }
 
+
+/* ---------------- Contorno al navegar con teclado ---------------- */
+/* Para que se vea donde estas cuando usas Tab */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,

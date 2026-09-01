@@ -1,8 +1,15 @@
+# ============================================================
+# ACCESORIO
+# Gorras, gorros, collares y cadenas. Siempre talla unica.
+# Los que cuestan 70 dolares o mas tienen 5% de descuento.
+# ============================================================
 from decimal import Decimal, ROUND_HALF_UP
 
 from app.models.producto import Producto
 
 
+
+# ---------------- La clase ----------------
 class Accesorio(Producto):
 
     TIPOS = ("Gorra", "Gorro", "Collar", "Cadena")
@@ -35,6 +42,8 @@ class Accesorio(Producto):
     def aplica_descuento_gama_alta(self):
         return self.precio_venta >= self.UMBRAL_VOLUMEN
 
+
+# ---------------- Precio con descuento de gama alta ----------------
     def calcular_precio_final(self):
         base = self.precio_venta
         if self.aplica_descuento_gama_alta:

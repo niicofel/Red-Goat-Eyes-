@@ -1,9 +1,16 @@
+# ============================================================
+# MENSAJE
+# Un mensaje del formulario de contacto. Puede venir de un
+# cliente registrado o de un visitante sin cuenta.
+# ============================================================
 import re
 from datetime import datetime
 
 from app.utils.excepciones import ErrorValidacion
 
 
+
+# ---------------- La clase ----------------
 class Mensaje:
 
     REGEX_EMAIL = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]{2,}$")
@@ -29,6 +36,8 @@ class Mensaje:
         return self._id_mensaje
 
     @property
+
+# ---------------- Campos con validacion ----------------
     def asunto(self):
         return self._asunto
 
@@ -93,6 +102,8 @@ class Mensaje:
         return self._leido
 
     @property
+
+# ---------------- Estado del mensaje ----------------
     def respondido_por(self):
         return self._respondido_por
 
@@ -109,6 +120,8 @@ class Mensaje:
         return self._id_cliente is None
 
     @property
+
+# ---------------- Un reclamo sin responder es urgente ----------------
     def es_urgente(self):
         return self._asunto == "Reclamo" and not self.respondido
 
@@ -126,6 +139,8 @@ class Mensaje:
         delta = self._fecha_respuesta - self._fecha_envio
         return round(delta.total_seconds() / 3600, 1)
 
+
+# ---------------- Marcar como leido y responder ----------------
     def marcar_leido(self):
         self._leido = True
 

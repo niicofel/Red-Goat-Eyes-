@@ -1,9 +1,19 @@
+/* ============================================================
+   COMPONENTS.CSS
+   Todo lo que se repite por el sitio: tarjetas, botones,
+   formularios, tablas, ventanas emergentes y el panel.
+   Es el archivo mas grande porque aqui vive casi todo el estilo.
+   ============================================================ */
+/* ---------------- Rejilla de tarjetas de producto ---------------- */
+/* auto-fill acomoda las columnas solas segun el ancho de la pantalla */
 .cards-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 40px;
 }
 
+
+/* ---------------- Tarjeta de producto ---------------- */
 .card {
     background: var(--blanco);
     text-decoration: none;
@@ -18,6 +28,9 @@
     transform: translateY(-5px);
 }
 
+
+/* ---------------- Imagen de la tarjeta ---------------- */
+/* position relative para poder poner encima la etiqueta y el badge */
 .card-image {
     position: relative;
     background: var(--gris-card);
@@ -31,6 +44,8 @@
     display: block;
 }
 
+
+/* ---------------- Etiqueta de categoria (Hoodie, Pantalon...) ---------------- */
 .badge {
     position: absolute;
     top: 15px;
@@ -44,6 +59,8 @@
     text-transform: uppercase;
 }
 
+
+/* ---------------- Datos de la tarjeta: nombre y precio ---------------- */
 .card-info {
     padding: 20px;
     display: flex;
@@ -73,6 +90,9 @@
     color: var(--blanco);
 }
 
+
+/* ---------------- Precios ---------------- */
+/* old-price aparece tachado cuando el producto esta en oferta */
 .price {
     font-size: 18px;
     font-weight: bold;
@@ -93,6 +113,8 @@
     font-weight: bold;
 }
 
+
+/* ---------------- Boton rojo de la tarjeta ---------------- */
 .btn-agregar {
     width: 100%;
     padding: 12px;
@@ -120,6 +142,8 @@
     margin-right: 6px;
 }
 
+
+/* ---------------- Formulario de contacto ---------------- */
 .contact-container {
     max-width: 600px;
     margin: 80px auto;
@@ -136,6 +160,9 @@
     color: var(--blanco);
 }
 
+
+/* ---------------- Campos de formulario ---------------- */
+/* Se reutiliza en contacto, login, registro y pago */
 .form-group {
     margin-bottom: 20px;
     display: flex;
@@ -214,6 +241,9 @@
     transform: translateY(-1px);
 }
 
+
+/* ---------------- Mensajes de error de los campos ---------------- */
+/* El JavaScript escribe aqui el texto cuando algo esta mal */
 .error {
     color: var(--error);
     font-size: 12px;
@@ -232,6 +262,9 @@
     margin-top: 4px;
 }
 
+
+/* ---------------- Avisos informativos ---------------- */
+/* Se muestran u ocultan con la clase oculto */
 .aviso-checkout {
     max-width: 600px;
     margin: 40px auto 0 auto;
@@ -319,10 +352,15 @@
     color: var(--rojo);
 }
 
+
+/* ---------------- Icono de usuario con sesion activa ---------------- */
 .sesion-activa {
     color: var(--rojo) !important;
 }
 
+
+/* ---------------- Notificacion flotante ---------------- */
+/* El mensajito verde o rojo que sale arriba y desaparece solo */
 .notificacion {
     position: fixed;
     bottom: 25px;
@@ -352,6 +390,8 @@
     border-left-color: var(--rojo);
 }
 
+
+/* ---------------- Pagina del carrito ---------------- */
 .pagina-carrito {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -374,6 +414,9 @@
     gap: 20px;
 }
 
+
+/* ---------------- Cada linea del carrito ---------------- */
+/* Una linea por combinacion de producto y talla */
 .carrito-item {
     display: grid;
     grid-template-columns: 110px 1fr auto;
@@ -416,6 +459,8 @@
     gap: 12px;
 }
 
+
+/* ---------------- Control de cantidad (- y +) ---------------- */
 .cantidad-control {
     display: flex;
     align-items: center;
@@ -446,6 +491,8 @@
     font-weight: bold;
 }
 
+
+/* ---------------- Boton de eliminar del carrito ---------------- */
 .btn-eliminar {
     background: none;
     border: none;
@@ -459,6 +506,8 @@
     color: var(--rojo);
 }
 
+
+/* ---------------- Mensaje de carrito vacio ---------------- */
 .mensaje-vacio {
     background: var(--blanco);
     padding: 60px 30px;
@@ -478,6 +527,9 @@
     margin-bottom: 25px;
 }
 
+
+/* ---------------- Resumen del carrito: subtotal, IVA y total ---------------- */
+/* Los valores los calcula el servidor, no el navegador */
 .carrito-resumen {
     background: var(--blanco);
     padding: 30px;
@@ -549,6 +601,8 @@
     color: var(--rojo);
 }
 
+
+/* ---------------- Pagina de pago ---------------- */
 .pagina-pago {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -581,6 +635,8 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.25);
 }
 
+
+/* ---------------- Opciones de metodo de pago ---------------- */
 .metodos-pago {
     display: flex;
     flex-direction: column;
@@ -638,6 +694,8 @@
     color: var(--gris-texto);
 }
 
+
+/* ---------------- Casilla de confirmacion del pago ---------------- */
 .grupo-confirmacion {
     background: var(--blanco);
     padding: 18px;
@@ -681,6 +739,8 @@
     background: var(--rojo-oscuro);
 }
 
+
+/* ---------------- Resumen lateral del pago ---------------- */
 .pago-resumen {
     background: var(--blanco);
     padding: 30px;
@@ -719,6 +779,9 @@
     white-space: nowrap;
 }
 
+
+/* ---------------- Pagina de agradecimiento ---------------- */
+/* Muestra el comprobante leido desde la base de datos */
 .gracias-container {
     max-width: 760px;
     margin: 70px auto;
@@ -747,6 +810,8 @@
     margin-bottom: 30px;
 }
 
+
+/* ---------------- Codigo del pedido (RGE-2026-0001) ---------------- */
 .gracias-codigo {
     background: var(--gris-fondo);
     padding: 20px;
@@ -792,6 +857,8 @@
     letter-spacing: 1px;
 }
 
+
+/* ---------------- Totales del comprobante ---------------- */
 .gracias-resumen {
     text-align: left;
     margin-bottom: 35px;
@@ -817,6 +884,8 @@
     color: var(--blanco);
 }
 
+
+/* ---------------- Panel de administracion ---------------- */
 .admin-container {
     padding: 50px 40px 0 40px;
     background: var(--gris-fondo);
@@ -829,6 +898,9 @@
     color: var(--negro-suave);
 }
 
+
+/* ---------------- Pestanas del panel ---------------- */
+/* El JavaScript agrega la clase activa a la pestana seleccionada */
 .admin-tabs {
     display: flex;
     gap: 8px;
@@ -863,6 +935,8 @@
     background: var(--gris-fondo);
 }
 
+
+/* ---------------- Bloques de reporte ---------------- */
 .reporte {
     background: var(--blanco);
     padding: 28px;
@@ -877,6 +951,8 @@
     border-bottom: 1px solid var(--gris-borde);
 }
 
+
+/* ---------------- Filtros de fecha de los reportes ---------------- */
 .reporte-filtros {
     display: flex;
     gap: 16px;
@@ -936,6 +1012,9 @@
     color: var(--rojo);
 }
 
+
+/* ---------------- Tablas del panel ---------------- */
+/* El contenedor tiene scroll propio para que la pagina no se desplace */
 .tabla-scroll {
     overflow-x: auto;
     width: 100%;
@@ -972,12 +1051,16 @@
     background: #ececec;
 }
 
+
+/* ---------------- Fila de tabla sin datos ---------------- */
 .tabla-vacia {
     text-align: center;
     color: var(--gris-texto);
     padding: 26px;
 }
 
+
+/* ---------------- Menu desplegable del usuario ---------------- */
 .usuario-menu {
     position: relative;
 }
@@ -1052,6 +1135,9 @@
   cursor: pointer;
 }
 
+
+/* ---------------- Etiqueta verde de stock en la tarjeta ---------------- */
+/* Muestra las unidades sumando todas las tallas del producto */
 .badge-stock {
   position: absolute;
   top: 15px;

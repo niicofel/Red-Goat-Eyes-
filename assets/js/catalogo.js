@@ -1,5 +1,14 @@
+// ============================================================
+// CATALOGO.JS
+// Se carga en hoodies, pantalones, accesorios y productos.
+// Hace dos cosas: actualiza las tarjetas con datos reales de la
+// base, y abre la ficha del producto para elegir talla.
+// ============================================================
 document.addEventListener("DOMContentLoaded", async function () {
 
+
+// ---------------- Buscar las tarjetas del HTML ----------------
+// Las tarjetas ya estan escritas en el HTML con su data-id
     const tarjetas = document.querySelectorAll(".card[data-id]");
 
     if (tarjetas.length === 0) {
@@ -22,6 +31,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     });
 
+
+// ---------------- Actualizar una tarjeta con datos reales ----------------
+// Cambia precio, stock y tallas por lo que dice la base de datos
     function sincronizarTarjeta(tarjeta, lista) {
         const real = lista.find(function (producto) {
             return producto.codigo === tarjeta.dataset.id;
@@ -63,6 +75,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+
+// ---------------- Etiqueta verde de unidades ----------------
     function pintarBadgeStock(tarjeta, real) {
         const contenedor = tarjeta.querySelector(".card-image") || tarjeta;
         let badge = tarjeta.querySelector(".badge-stock");
@@ -82,6 +96,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+
+// ---------------- Etiquetas de tallas bajo el precio ----------------
     function pintarTallasTarjeta(tarjeta, real) {
         let contenedor = tarjeta.querySelector(".card-tallas-preview");
 
@@ -108,6 +124,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+
+// ---------------- Abrir la ficha del producto ----------------
+// Pide el detalle a la API porque el catalogo no trae el stock de cada talla
     async function abrirModalDetalle(codigo) {
         let producto;
 
@@ -125,6 +144,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.body.classList.add("modal-abierto");
     }
 
+
+// ---------------- Crear la ventana emergente ----------------
+// Se crea una sola vez y se reutiliza. Se cierra con clic fuera o Escape
     function obtenerModal() {
         let modal = document.getElementById("modal-producto");
 
@@ -150,11 +172,16 @@ document.addEventListener("DOMContentLoaded", async function () {
         return modal;
     }
 
+
+// ---------------- Cerrar la ventana ----------------
     function cerrarModal(modal) {
         modal.classList.remove("activo");
         document.body.classList.remove("modal-abierto");
     }
 
+
+// ---------------- Armar el contenido de la ficha ----------------
+// Todo con createElement y textContent, nunca innerHTML, para evitar XSS
     function construirTarjetaModal(producto, modal) {
         const tarjeta = crear("div", "modal-card");
 
@@ -295,6 +322,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         return tarjeta;
     }
 
+
+// ---------------- Ayudante para crear elementos ----------------
+// Ahorra repetir createElement, className y textContent cada vez
     function crear(etiqueta, clases, texto) {
         const elemento = document.createElement(etiqueta);
 
@@ -308,11 +338,16 @@ document.addEventListener("DOMContentLoaded", async function () {
         return elemento;
     }
 
+
+// ---------------- Sacar la imagen de la tarjeta ----------------
     function imagenDeTarjeta(codigo) {
         const tarjeta = document.querySelector('.card[data-id="' + codigo + '"]');
         return tarjeta ? tarjeta.dataset.imagen : "";
     }
 
+
+// ---------------- Agregar al carrito ----------------
+// Antes de agregar le vuelve a preguntar al servidor si hay stock de esa talla
     async function agregarAlCarrito(producto, estado, cantidad, modal, boton) {
         if (estado.ptid === null) {
             rgeNotificar("Selecciona una talla disponible", "aviso");

@@ -1,5 +1,13 @@
+// ============================================================
+// CARRITO.JS
+// Solo en carrito.html. Pinta las lineas y los totales.
+// Cada talla es una linea aparte, por eso todo se identifica
+// con id_producto_talla y no con el codigo del producto.
+// ============================================================
 document.addEventListener("DOMContentLoaded", async function () {
 
+
+// ---------------- Elementos de la pagina ----------------
     const contenedor = document.getElementById("carrito-items");
     const vacio      = document.getElementById("carrito-vacio");
     const botonPagar = document.getElementById("btn-continuar");
@@ -17,6 +25,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         botonPagar.addEventListener("click", continuarAlPago);
     }
 
+
+// ---------------- Dibujar el carrito ----------------
+// Si esta vacio muestra el mensaje y desactiva el boton de pagar
     async function pintarCarrito() {
         const carrito = rgeLeerCarrito();
         contenedor.textContent = "";
@@ -60,6 +71,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+
+// ---------------- Una linea del carrito ----------------
+// Muestra el producto con su talla, la cantidad y el subtotal
     function crearFila(item) {
 
         const fila = document.createElement("article");
@@ -137,6 +151,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         return fila;
     }
 
+
+// ---------------- Cambiar cantidad con - y + ----------------
+// Consulta el stock de esa talla antes de dejar subir
     async function cambiarCantidad(idProductoTalla, cambio) {
         const carrito = rgeLeerCarrito();
 
@@ -174,6 +191,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         await pintarCarrito();
     }
 
+
+// ---------------- Quitar una linea ----------------
     async function eliminarItem(idProductoTalla) {
         const carrito = rgeLeerCarrito().filter(function (producto) {
             return producto.id_producto_talla !== idProductoTalla;
@@ -184,6 +203,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         await pintarCarrito();
     }
 
+
+// ---------------- Escribir subtotal, IVA y total ----------------
     function actualizarResumen(totales) {
         const subtotal = document.getElementById("resumen-subtotal");
         const iva      = document.getElementById("resumen-iva");
@@ -200,6 +221,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+
+// ---------------- Boton de continuar al pago ----------------
+// Si no hay sesion manda al login guardando el destino en la URL
     function continuarAlPago() {
         const carrito = rgeLeerCarrito();
 

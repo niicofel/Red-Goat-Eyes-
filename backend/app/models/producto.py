@@ -1,13 +1,23 @@
+# ============================================================
+# PRODUCTO
+# Clase abstracta de la que heredan Hoodie, Pantalon y Accesorio.
+# Cada hijo calcula su precio final de forma distinta:
+# ahi esta el polimorfismo del proyecto.
+# ============================================================
 from abc import ABC, abstractmethod
 from decimal import Decimal, ROUND_HALF_UP
 
 from app.utils.excepciones import ErrorValidacion
 
 
+
+# ---------------- La clase ----------------
 class Producto(ABC):
 
     IVA = Decimal("0.15")
 
+
+# ---------------- Constructor ----------------
     def __init__(self, id_producto, codigo, nombre, descripcion, precio,
                  imagen_principal, categoria, material=None, genero="Unisex",
                  precio_oferta=None, activo=True, destacado=False):
@@ -35,6 +45,8 @@ class Producto(ABC):
         return self._codigo
 
     @property
+
+# ---------------- Nombre y descripcion con validacion ----------------
     def nombre(self):
         return self._nombre
 
@@ -57,6 +69,9 @@ class Producto(ABC):
         self._descripcion = texto
 
     @property
+
+# ---------------- Precios ----------------
+# Se usa Decimal, nunca float, porque float pierde precision con dinero
     def precio(self):
         return self.__precio
 
@@ -85,6 +100,8 @@ class Producto(ABC):
         self.__precio_oferta = monto.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
     @property
+
+# ---------------- Genero permitido ----------------
     def genero(self):
         return self._genero
 
@@ -116,6 +133,8 @@ class Producto(ABC):
         return self._destacado
 
     @property
+
+# ---------------- Datos de oferta y descuento ----------------
     def en_oferta(self):
         return self.__precio_oferta is not None
 
@@ -130,9 +149,13 @@ class Producto(ABC):
         diferencia = (self.__precio - self.__precio_oferta) / self.__precio * 100
         return int(diferencia.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
 
+
+# ---------------- IVA del producto ----------------
     def calcular_iva(self):
         return (self.precio_venta * self.IVA).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
+
+# ---------------- Poner y quitar ofertas ----------------
     def aplicar_oferta(self, porcentaje):
         if not 0 < porcentaje < 100:
             raise ErrorValidacion("porcentaje", "El descuento debe estar entre 1 y 99")
@@ -145,6 +168,9 @@ class Producto(ABC):
     def desactivar(self):
         self._activo = False
 
+
+# ---------------- Lo que cada tipo de producto debe definir ----------------
+# calcular_precio_final es distinto en hoodie, pantalon y accesorio
     @abstractmethod
     def calcular_precio_final(self):
         pass
@@ -157,6 +183,8 @@ class Producto(ABC):
     def tipo(self):
         pass
 
+
+# ---------------- Convertir a diccionario para la API ----------------
     def a_diccionario(self):
         return {
             "id_producto": self._id_producto,
@@ -176,6 +204,8 @@ class Producto(ABC):
             "destacado": self._destacado,
         }
 
+
+# ---------------- Metodos especiales ----------------
     def __str__(self):
         return f"{self._codigo} - {self._nombre} (${self.calcular_precio_final()})"
 

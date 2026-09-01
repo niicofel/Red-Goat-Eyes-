@@ -1,9 +1,17 @@
+# ============================================================
+# CARRITO
+# El carrito antes de comprar. Guarda los items en un diccionario
+# usando el id_producto_talla como llave, para que cada talla
+# sea una linea distinta.
+# ============================================================
 from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
 
 from app.utils.excepciones import ErrorValidacion, StockInsuficiente, CarritoVacio
 
 
+
+# ---------------- La clase ----------------
 class Carrito:
 
     IVA = Decimal("0.15")
@@ -50,6 +58,8 @@ class Carrito:
     def _tocar(self):
         self._fecha_actualizacion = datetime.now()
 
+
+# ---------------- Agregar, actualizar y quitar items ----------------
     def agregar(self, producto_talla, cantidad=1):
         if cantidad <= 0:
             raise ErrorValidacion("cantidad", "La cantidad debe ser mayor que cero")
@@ -95,6 +105,8 @@ class Carrito:
     def contiene(self, id_producto_talla):
         return id_producto_talla in self._items
 
+
+# ---------------- Calculos del carrito ----------------
     def calcular_subtotal(self):
         total = sum(
             (pt.producto.calcular_precio_final() * cantidad
@@ -111,6 +123,8 @@ class Carrito:
         return (self.calcular_subtotal() + self.calcular_iva()).quantize(
             Decimal("0.01"), rounding=ROUND_HALF_UP)
 
+
+# ---------------- Comprobar que se puede pagar ----------------
     def validar_para_pago(self):
         if self.vacio:
             raise CarritoVacio()
@@ -120,6 +134,8 @@ class Carrito:
                                         cantidad, producto_talla.stock)
         return True
 
+
+# ---------------- Convertir para mandarlo a la API ----------------
     def a_lista_items(self):
         return [
             {"id_producto_talla": pt.id_producto_talla, "cantidad": cantidad}

@@ -1,8 +1,15 @@
+# ============================================================
+# DIRECCION
+# Direccion de entrega de un cliente. Un cliente puede tener
+# varias, pero solo una es la principal.
+# ============================================================
 import re
 
 from app.utils.excepciones import ErrorValidacion
 
 
+
+# ---------------- La clase ----------------
 class Direccion:
 
     REGEX_POSTAL = re.compile(r"^[0-9]{6}$")
@@ -56,6 +63,8 @@ class Direccion:
         return self._referencia
 
     @property
+
+# ---------------- Codigo postal con validacion ----------------
     def codigo_postal(self):
         return self._codigo_postal
 
@@ -73,12 +82,16 @@ class Direccion:
     def es_principal(self):
         return self._es_principal
 
+
+# ---------------- Marcar como principal ----------------
     def marcar_principal(self):
         self._es_principal = True
 
     def quitar_principal(self):
         self._es_principal = False
 
+
+# ---------------- Armar la direccion como texto ----------------
     def formato_completo(self):
         partes = [self._calle_principal]
         if self._numeracion:

@@ -1,3 +1,9 @@
+// ============================================================
+// VALIDACIONES.JS
+// Solo en contacto.html. Valida el formulario y lo envia.
+// El mensaje se guarda en la base y ademas se avisa por correo
+// al administrador.
+// ============================================================
 document.addEventListener("DOMContentLoaded", async function () {
 
     const form = document.getElementById("contactForm");
@@ -6,6 +12,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         return;
     }
 
+
+// ---------------- Si hay sesion, rellenar nombre y correo ----------------
     const sesion = await rgeCargarSesion();
 
     let selectCiudad = null;
@@ -25,6 +33,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+
+// ---------------- Enviar el mensaje ----------------
+// Si la API rechaza un campo, el error se muestra debajo de ese campo
     form.addEventListener("submit", async function (evento) {
         evento.preventDefault();
 
@@ -88,6 +99,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     });
 
+
+// ---------------- Traer los asuntos de la base ----------------
+// La base guarda 'Consulta' con mayuscula, por eso no se escriben a mano
     async function cargarAsuntos() {
         const select = document.getElementById("asunto");
 
@@ -117,6 +131,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+
+// ---------------- Convertir el campo Ciudad en un menu ----------------
+// En el HTML es un input de texto; aqui se reemplaza por un select con las 30 ciudades
     async function construirSelectCiudades() {
         const original = document.getElementById("ciudad");
 
@@ -152,6 +169,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         return select;
     }
 
+
+// ---------------- Validar los campos ----------------
     function validarFormulario() {
         let esValido = true;
 
@@ -215,6 +234,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         return esValido;
     }
 
+
+// ---------------- Mostrar y limpiar errores ----------------
     function mostrarError(elemento, mensaje) {
         if (!elemento) {
             rgeNotificar(mensaje, "aviso");

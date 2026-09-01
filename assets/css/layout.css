@@ -1,8 +1,12 @@
+
+/* ---------------- Cabecera del sitio ---------------- */
 .site-header {
     position: relative;
     z-index: 1000;
 }
 
+
+/* ---------------- Barra superior de ubicacion ---------------- */
 .top-bar {
     background-color: var(--gris-barra);
     padding: 8px 40px;
@@ -15,6 +19,8 @@
     gap: 6px;
 }
 
+
+/* ---------------- Barra de navegacion ---------------- */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -31,6 +37,9 @@
     display: block;
 }
 
+
+/* ---------------- Boton hamburguesa ---------------- */
+/* Escondido en escritorio, aparece bajo 768px desde responsive.css */
 .menu-toggle {
     display: none;
     background: none;
@@ -41,6 +50,8 @@
     padding: 8px;
 }
 
+
+/* ---------------- Enlaces del menu ---------------- */
 .nav-links {
     list-style: none;
     display: flex;
@@ -63,6 +74,9 @@
     color: var(--rojo);
 }
 
+
+/* ---------------- Submenu de categorias ---------------- */
+/* Se despliega al pasar el mouse por encima */
 .dropdown-menu {
     position: absolute;
     top: 100%;
@@ -89,6 +103,8 @@
     display: block;
 }
 
+
+/* ---------------- Iconos de carrito y usuario ---------------- */
 .nav-icons {
     display: flex;
     gap: 20px;
@@ -110,6 +126,9 @@
     position: relative;
 }
 
+
+/* ---------------- Contador del carrito ---------------- */
+/* El numerito rojo. El JavaScript lo esconde cuando el carrito esta vacio */
 .cart-count {
     position: absolute;
     top: -8px;
@@ -127,6 +146,8 @@
     padding: 0 4px;
 }
 
+
+/* ---------------- Banner principal de la portada ---------------- */
 .hero {
     position: relative;
     min-height: 80vh;
@@ -165,6 +186,8 @@
     margin-bottom: 30px;
 }
 
+
+/* ---------------- Enlaces de Instagram ---------------- */
 .social-icons {
     display: flex;
     justify-content: center;
@@ -181,6 +204,8 @@
     color: var(--rojo);
 }
 
+
+/* ---------------- Franja de beneficios ---------------- */
 .benefits {
     background-color: var(--negro-benefits);
     color: var(--blanco);
@@ -212,12 +237,17 @@
     color: var(--gris-claro);
 }
 
+
+/* ---------------- Rejillas de categorias y catalogo ---------------- */
+/* auto-fit hace que las columnas se acomoden solas al ancho disponible */
 .subsections,
 .catalogo {
     padding: 60px 40px;
     background: var(--gris-fondo);
 }
 
+
+/* ---------------- Pie de pagina ---------------- */
 .footer {
     background-color: var(--negro);
     color: var(--gris-claro);

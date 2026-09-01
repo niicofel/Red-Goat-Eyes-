@@ -1,3 +1,8 @@
+// ============================================================
+// MENU.JS
+// Se carga en las 13 paginas. Solo abre y cierra el menu
+// hamburguesa en pantallas pequenas.
+// ============================================================
 document.addEventListener("DOMContentLoaded", function () {
 
     const boton = document.getElementById("menu-toggle");

@@ -1,5 +1,13 @@
+// ============================================================
+// AUTH.JS
+// Se carga en login.html y registro.html.
+// Valida los campos en el navegador y luego llama a la API.
+// ============================================================
 document.addEventListener("DOMContentLoaded", async function () {
 
+
+// ---------------- Detectar en que pagina estamos ----------------
+// El mismo archivo sirve para login y registro
     const formLogin    = document.getElementById("loginForm");
     const formRegistro = document.getElementById("registroForm");
 
@@ -9,6 +17,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const cedulaRegex = /^[0-9]{10}$/;
 
+
+// ---------------- Destino despues de iniciar sesion ----------------
+// Si venia del carrito, la URL trae ?destino=pago y vuelve alli
     const parametros = new URLSearchParams(window.location.search);
     const vieneDelCarrito = parametros.get("destino") === "pago";
     const destino = vieneDelCarrito ? "pago.html" : "productos.html";
@@ -29,6 +40,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         await cargarCiudades(selectCiudad);
     }
 
+
+// ---------------- Iniciar sesion ----------------
+// Si el rol es administrador lo manda al panel; si no, al destino
     if (formLogin) {
         formLogin.addEventListener("submit", async function (evento) {
             evento.preventDefault();
@@ -87,6 +101,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+
+// ---------------- Crear cuenta ----------------
+// El navegador valida lo basico; Python valida la cedula de verdad
     if (formRegistro) {
         formRegistro.addEventListener("submit", async function (evento) {
             evento.preventDefault();
@@ -174,6 +191,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+
+// ---------------- Llenar el menu de ciudades ----------------
+// Las 30 ciudades vienen de la base, no estan escritas en el HTML
     async function cargarCiudades(select) {
         try {
             const datos = await rgeApi("/ciudades");
@@ -197,6 +217,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+
+// ---------------- Colocar el error donde corresponde ----------------
+// La API dice que campo fallo y aqui se pone el mensaje debajo de ese campo
     function mostrarErrorPorCampo(error) {
         const mapa = {
             email: "reg-email",
@@ -223,6 +246,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+
+// ---------------- Bloquear el boton mientras se envia ----------------
+// Evita que el usuario mande el formulario dos veces
     function bloquear(boton, texto) {
         if (boton) {
             boton.disabled = true;
@@ -238,6 +264,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+
+// ---------------- Mostrar y limpiar errores ----------------
     function mostrarError(elemento, mensaje) {
         if (!elemento) {
             rgeNotificar(mensaje, "aviso");

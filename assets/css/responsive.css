@@ -1,3 +1,10 @@
+/* ============================================================
+   RESPONSIVE.CSS
+   Se carga al final para poder sobrescribir lo anterior.
+   Cuatro puntos de quiebre, de mayor a menor ancho.
+   ============================================================ */
+/* ---------------- Tablet horizontal (hasta 992px) ---------------- */
+/* La rejilla de productos pasa de 3 a 2 columnas */
 @media (max-width: 992px) {
 
     .cards-container {
@@ -20,6 +27,9 @@
 
 }
 
+
+/* ---------------- Tablet y celular (hasta 768px) ---------------- */
+/* Aparece el menu hamburguesa y se colapsa la navegacion */
 @media (max-width: 768px) {
 
     .navbar {
@@ -193,6 +203,9 @@
 
 }
 
+
+/* ---------------- Celular grande (hasta 600px) ---------------- */
+/* Los formularios pasan a una sola columna */
 @media (max-width: 600px) {
 
     .cards-container {
@@ -214,6 +227,9 @@
 
 }
 
+
+/* ---------------- Celular pequeno (hasta 480px) ---------------- */
+/* Todo en una columna y letra mas pequena */
 @media (max-width: 480px) {
 
     .top-bar {

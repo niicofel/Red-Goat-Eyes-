@@ -1,3 +1,10 @@
+-- ============================================================
+-- 05 · VISTAS Y REPORTES
+-- Una vista es una consulta guardada con nombre.
+-- Aqui estan las 2 vistas del sistema y los 4 reportes del panel.
+-- ============================================================
+-- ---------------- Reporte 1: ventas por categoria ----------------
+-- Usa RANK() para ordenar las categorias por lo que vendieron
 CREATE OR REPLACE VIEW rpt_ventas_por_categoria AS
 SELECT
     c.nombre                                        AS categoria,
@@ -71,6 +78,9 @@ COMMENT ON FUNCTION fn_rpt_ventas_por_categoria(DATE, DATE) IS
     'Reporte 1 filtrado por rango de fechas. Alimenta los campos Desde y Hasta de admin.html';
 
 
+
+-- ---------------- Reporte 2: ranking de clientes ----------------
+-- Usa un CTE (el WITH de arriba) y DENSE_RANK para el ranking
 CREATE OR REPLACE VIEW rpt_top_clientes AS
 WITH compras_cliente AS (
     SELECT
@@ -121,6 +131,9 @@ COMMENT ON VIEW rpt_top_clientes IS
 
 
 
+
+-- ---------------- Reporte 3: productos por agotarse ----------------
+-- Subconsulta correlacionada: calcula la demanda de los ultimos 30 dias
 CREATE OR REPLACE VIEW rpt_stock_critico AS
 SELECT
     p.codigo,
@@ -177,6 +190,9 @@ COMMENT ON VIEW rpt_stock_critico IS
 
 
 
+
+-- ---------------- Reporte 4: mensajes de contacto ----------------
+-- Usa FILTER para contar solo los que cumplen una condicion
 CREATE OR REPLACE VIEW rpt_mensajes_contacto AS
 SELECT
     a.nombre                                          AS asunto,
@@ -248,6 +264,9 @@ COMMENT ON FUNCTION fn_rpt_mensajes_periodo(DATE, DATE) IS
 
 
 
+
+-- ---------------- Vista segura de usuarios ----------------
+-- Igual que la tabla usuario pero SIN el hash de la contrasena
 CREATE OR REPLACE VIEW v_usuario_seguro AS
 SELECT
     u.id_usuario,
@@ -274,6 +293,9 @@ COMMENT ON VIEW v_usuario_seguro IS
     'Datos de usuario SIN password_hash. Es la unica via de lectura para la aplicacion';
 
 
+
+-- ---------------- Catalogo publico ----------------
+-- Agrupa por producto y suma el stock de todas sus tallas. Sin esto el catalogo mostraria 72 filas
 DROP VIEW IF EXISTS v_catalogo_publico;
 
 CREATE VIEW v_catalogo_publico AS

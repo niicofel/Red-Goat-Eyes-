@@ -1,3 +1,9 @@
+# ============================================================
+# VALIDADORES
+# Funciones de validacion que se reutilizan en todo el backend.
+# Son la segunda barrera: la primera es el navegador y la
+# tercera son las restricciones CHECK de PostgreSQL.
+# ============================================================
 import re
 from datetime import date
 
@@ -14,10 +20,14 @@ PROVINCIAS_VALIDAS = tuple(range(1, 25)) + (30,)
 COEFICIENTES_CEDULA = (2, 1, 2, 1, 2, 1, 2, 1, 2)
 
 
+
+# ---------------- Limpiar espacios sobrantes ----------------
 def texto_limpio(valor):
     return "" if valor is None else str(valor).strip()
 
 
+
+# ---------------- Largo de un texto ----------------
 def validar_longitud(campo, valor, minimo, maximo=None):
     texto = texto_limpio(valor)
     if len(texto) < minimo:
@@ -27,6 +37,8 @@ def validar_longitud(campo, valor, minimo, maximo=None):
     return texto
 
 
+
+# ---------------- Correo electronico ----------------
 def validar_email(valor, campo="email"):
     texto = texto_limpio(valor).lower()
     if not REGEX_EMAIL.match(texto):
@@ -51,6 +63,8 @@ def cedula_valida(cedula):
     return (10 - suma % 10) % 10 == int(texto[9])
 
 
+
+# ---------------- Cedula ecuatoriana ----------------
 def validar_cedula(valor, campo="cedula", obligatoria=True):
     texto = texto_limpio(valor)
     if not texto:
@@ -64,6 +78,8 @@ def validar_cedula(valor, campo="cedula", obligatoria=True):
     return texto
 
 
+
+# ---------------- Telefono ----------------
 def validar_telefono(valor, campo="telefono", obligatorio=False):
     texto = texto_limpio(valor)
     if not texto:
@@ -75,6 +91,8 @@ def validar_telefono(valor, campo="telefono", obligatorio=False):
     return texto
 
 
+
+# ---------------- Contrasena ----------------
 def validar_password(valor, campo="password", minimo=8):
     texto = "" if valor is None else str(valor)
     if len(texto) < minimo:
@@ -84,6 +102,8 @@ def validar_password(valor, campo="password", minimo=8):
     return texto
 
 
+
+# ---------------- Numeros enteros ----------------
 def validar_entero(valor, campo, minimo=None, maximo=None):
     try:
         numero = int(valor)
@@ -96,10 +116,14 @@ def validar_entero(valor, campo, minimo=None, maximo=None):
     return numero
 
 
+
+# ---------------- Cantidad de un pedido ----------------
 def validar_cantidad(valor, campo="cantidad"):
     return validar_entero(valor, campo, minimo=1, maximo=999)
 
 
+
+# ---------------- Fecha de nacimiento ----------------
 def validar_fecha_nacimiento(valor, campo="fecha_nacimiento", obligatoria=False):
     texto = texto_limpio(valor)
     if not texto:
@@ -140,6 +164,8 @@ def validar_codigo_postal(valor, campo="codigo_postal", obligatorio=False):
     return texto
 
 
+
+# ---------------- Que el valor este en una lista permitida ----------------
 def validar_opcion(valor, campo, opciones):
     texto = texto_limpio(valor)
     if texto not in opciones:

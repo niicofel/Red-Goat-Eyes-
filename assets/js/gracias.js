@@ -1,5 +1,13 @@
+// ============================================================
+// GRACIAS.JS
+// Solo en gracias.html. Muestra el comprobante.
+// Lo importante: los datos se leen de la base, no del navegador,
+// para que el recibo sea el pedido real.
+// ============================================================
 document.addEventListener("DOMContentLoaded", async function () {
 
+
+// ---------------- Elementos de la tabla del comprobante ----------------
     const cuerpo = document.querySelector("#tabla-pedido tbody");
     const codigo = document.getElementById("codigo-pedido");
 
@@ -9,6 +17,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     await rgeCargarSesion();
 
+
+// ---------------- Recuperar el codigo del pedido ----------------
+// Se guardo en localStorage al confirmar el pago
     const codigoPedido = localStorage.getItem(RGE_CLAVE_PEDIDO);
 
     if (!codigoPedido) {
@@ -43,6 +54,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     escribirTexto("gracias-direccion", direccion);
 
+
+// ---------------- Pintar las lineas del pedido ----------------
     pedido.detalles.forEach(function (linea) {
         const fila = document.createElement("tr");
 
@@ -58,6 +71,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     escribirTotal("gracias-iva", pedido.iva);
     escribirTotal("gracias-total", pedido.total);
 
+
+// ---------------- Ayudantes para escribir en la tabla ----------------
     function crearCelda(texto) {
         const celda = document.createElement("td");
         celda.textContent = texto;
@@ -80,6 +95,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+
+// ---------------- Mensaje cuando no hay pedido ----------------
     function mostrarSinPedido(mensaje) {
         const fila  = document.createElement("tr");
         const celda = document.createElement("td");

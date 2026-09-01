@@ -1,8 +1,15 @@
+# ============================================================
+# DETALLE PEDIDO
+# Una linea del pedido. Lo importante: el precio se congela
+# al comprar, asi el pedido no cambia si el producto sube manana.
+# ============================================================
 from decimal import Decimal, ROUND_HALF_UP
 
 from app.utils.excepciones import ErrorValidacion
 
 
+
+# ---------------- La clase ----------------
 class DetallePedido:
 
     def __init__(self, id_detalle, producto_talla, cantidad,
@@ -13,6 +20,8 @@ class DetallePedido:
         self._precio_unitario = self._congelar_precio(precio_unitario)
         self.descuento = descuento
 
+
+# ---------------- Congelar el precio de compra ----------------
     def _congelar_precio(self, precio_unitario):
         if precio_unitario is not None:
             monto = Decimal(str(precio_unitario))
@@ -39,6 +48,8 @@ class DetallePedido:
         return self._producto_talla.talla
 
     @property
+
+# ---------------- Cantidad y descuento con validacion ----------------
     def cantidad(self):
         return self._cantidad
 
@@ -68,6 +79,8 @@ class DetallePedido:
         self._descuento = monto.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
     @property
+
+# ---------------- Calculo de la linea ----------------
     def importe_bruto(self):
         return (self._precio_unitario * self._cantidad).quantize(
             Decimal("0.01"), rounding=ROUND_HALF_UP)
@@ -77,6 +90,8 @@ class DetallePedido:
         return (self.importe_bruto - self._descuento).quantize(
             Decimal("0.01"), rounding=ROUND_HALF_UP)
 
+
+# ---------------- Subir y bajar la cantidad ----------------
     def aumentar(self, unidades=1):
         self.cantidad = self._cantidad + unidades
         return self._cantidad

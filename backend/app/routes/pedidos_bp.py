@@ -1,3 +1,7 @@
+# ============================================================
+# RUTAS DE PEDIDOS
+# Calcular totales, registrar la compra y consultar pedidos.
+# ============================================================
 from flask import Blueprint, jsonify, request
 
 from app.routes.sesion import requiere_admin, requiere_sesion, usuario_actual
@@ -9,17 +13,25 @@ _servicio = PedidoService()
 _correo = CorreoService()
 
 
+
+# ---------------- Calcular totales del carrito ----------------
+# Publico: se puede calcular sin tener sesion
 @pedidos_bp.post("/calcular")
 def calcular():
     datos = request.get_json(silent=True) or {}
     return jsonify(_servicio.calcular_totales(datos.get("items") or []))
 
 
+
+# ---------------- Metodos de pago disponibles ----------------
 @pedidos_bp.get("/metodos-pago")
 def metodos_pago():
     return jsonify({"metodos": _servicio.metodos_pago()})
 
 
+
+# ---------------- Registrar un pedido ----------------
+# Despues de crearlo, lanza el envio del recibo en segundo plano
 @pedidos_bp.post("")
 @requiere_sesion
 def crear():
@@ -30,6 +42,8 @@ def crear():
     return jsonify({"mensaje": "Pedido registrado", "pedido": pedido}), 201
 
 
+
+# ---------------- Pedidos del cliente conectado ----------------
 @pedidos_bp.get("/mios")
 @requiere_sesion
 def mios():
@@ -38,6 +52,8 @@ def mios():
     return jsonify({"total": len(datos), "pedidos": datos})
 
 
+
+# ---------------- Todos los pedidos (solo admin) ----------------
 @pedidos_bp.get("/todos")
 @requiere_admin()
 def todos():
@@ -46,12 +62,16 @@ def todos():
     return jsonify({"total": len(datos), "pedidos": datos})
 
 
+
+# ---------------- Estado del correo (solo admin) ----------------
 @pedidos_bp.get("/correos/estado")
 @requiere_admin()
 def correos_estado():
     return jsonify(_correo.probar_conexion())
 
 
+
+# ---------------- Procesar la cola de correos ----------------
 @pedidos_bp.post("/correos/procesar")
 @requiere_admin()
 def correos_procesar():
@@ -59,6 +79,9 @@ def correos_procesar():
     return jsonify(_correo.enviar_pendientes(limite))
 
 
+
+# ---------------- Detalle de un pedido ----------------
+# Un cliente solo puede ver los suyos: si no, responde 403
 @pedidos_bp.get("/<codigo>")
 @requiere_sesion
 def detalle(codigo):
@@ -73,6 +96,8 @@ def detalle(codigo):
     return jsonify(pedido)
 
 
+
+# ---------------- Cambiar el estado (admin nivel 2) ----------------
 @pedidos_bp.patch("/<codigo>/estado")
 @requiere_admin(nivel_minimo=2)
 def cambiar_estado(codigo):

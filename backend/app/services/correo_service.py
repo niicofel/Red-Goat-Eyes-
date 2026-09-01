@@ -1,3 +1,9 @@
+# ============================================================
+# CORREO SERVICE
+# Manda los correos por SMTP (Gmail).
+# PostgreSQL no puede mandar correos porque no tiene cliente SMTP.
+# Por eso la base ENCOLA en la tabla envio_correo y Flask ENVIA.
+# ============================================================
 import logging
 import smtplib
 import threading
@@ -10,6 +16,8 @@ from app.services.pdf_service import PdfService
 log = logging.getLogger(__name__)
 
 
+
+# ---------------- La clase ----------------
 class CorreoService:
 
     def __init__(self, pedido_repo=None, pdf_service=None):
@@ -17,10 +25,15 @@ class CorreoService:
         self._pdf = pdf_service or PdfService()
 
     @property
+
+# ---------------- Saber si el correo esta configurado ----------------
+# Si falta la clave en el .env, el sistema sigue funcionando sin enviar
     def configurado(self):
         clave = Config.SMTP_CLAVE or ""
         return bool(Config.SMTP_USUARIO and clave and "PEGA_AQUI" not in clave)
 
+
+# ---------------- Conectar con Gmail ----------------
     def _conectar(self):
         servidor = smtplib.SMTP(Config.SMTP_HOST, Config.SMTP_PUERTO, timeout=20)
         servidor.ehlo()
@@ -32,6 +45,8 @@ class CorreoService:
         servidor.login(Config.SMTP_USUARIO, Config.SMTP_CLAVE)
         return servidor
 
+
+# ---------------- Probar la conexion sin enviar nada ----------------
     def probar_conexion(self):
         if not self.configurado:
             return {"configurado": False,
@@ -49,6 +64,9 @@ class CorreoService:
             return {"configurado": True, "conectado": False,
                     "mensaje": f"No se pudo conectar: {error}"}
 
+
+# ---------------- Armar el correo del recibo ----------------
+# Lleva version en texto, version en HTML y el PDF adjunto
     def _armar_mensaje(self, destinatario, asunto, pedido, adjunto):
         mensaje = EmailMessage()
         mensaje["From"] = Config.SMTP_REMITENTE or Config.SMTP_USUARIO
@@ -72,6 +90,8 @@ class CorreoService:
         return mensaje
 
     @staticmethod
+
+# ---------------- Version bonita del correo ----------------
     def _cuerpo_html(pedido):
         codigo = pedido.get("codigo_pedido", "")
         cliente = pedido.get("cliente", "")
@@ -136,6 +156,9 @@ font-family:Arial,Helvetica,sans-serif;color:#111">
 </div>
 </body></html>"""
 
+
+# ---------------- Procesar la cola de correos ----------------
+# Lee los pendientes, arma el PDF, envia y marca el resultado
     def enviar_pendientes(self, limite=20):
         resumen = {"pendientes": 0, "enviados": 0, "fallidos": 0, "detalles": []}
 
@@ -176,6 +199,8 @@ font-family:Arial,Helvetica,sans-serif;color:#111">
 
         return resumen
 
+
+# ---------------- Enviar un correo de la cola ----------------
     def _procesar_uno(self, servidor, correo, resumen):
         id_envio = correo["id_envio"]
         codigo = correo["codigo_pedido"]
@@ -203,6 +228,9 @@ font-family:Arial,Helvetica,sans-serif;color:#111">
             resumen["detalles"].append(f"{codigo} fallo: {detalle}")
             log.error("Fallo el envio de %s: %s", codigo, detalle)
 
+
+# ---------------- Avisar de un mensaje de contacto ----------------
+# Va al buzon de la tienda con Reply-To del cliente, para poder responderle directo
     def notificar_mensaje_contacto(self, datos):
         if not self.configurado:
             log.warning("SMTP sin configurar: no se avisa del mensaje de contacto")
@@ -247,6 +275,8 @@ font-family:Arial,Helvetica,sans-serif;color:#111">
                 pass
 
     @staticmethod
+
+# ---------------- Version HTML del aviso de contacto ----------------
     def _html_contacto(datos):
         return f"""<html><body style="margin:0;padding:24px;background:#f5f5f5;
 font-family:Arial,Helvetica,sans-serif;color:#111">
@@ -275,6 +305,8 @@ font-family:Arial,Helvetica,sans-serif;color:#111">
 </div>
 </body></html>"""
 
+
+# ---------------- Avisar sin hacer esperar al usuario ----------------
     def notificar_contacto_en_segundo_plano(self, datos):
         if not self.configurado:
             return False
@@ -284,6 +316,9 @@ font-family:Arial,Helvetica,sans-serif;color:#111">
         hilo.start()
         return True
 
+
+# ---------------- Enviar en un hilo aparte ----------------
+# Asi la venta no se queda esperando a que Gmail responda
     def enviar_pendientes_en_segundo_plano(self, limite=20):
         if not self.configurado:
             log.warning("SMTP sin configurar: el recibo queda en cola")

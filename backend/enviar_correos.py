@@ -1,3 +1,8 @@
+# ============================================================
+# ENVIAR_CORREOS.PY
+# Procesa la cola de correos pendientes.
+# Se usa cuando un recibo no salio: python enviar_correos.py
+# ============================================================
 import sys
 
 from app import create_app
@@ -5,6 +10,9 @@ from app.config import Config
 from app.services.correo_service import CorreoService
 
 
+
+# ---------------- Procesar la cola ----------------
+# Comprueba la conexion con Gmail y manda los correos que estan pendientes
 def main():
     create_app()
     servicio = CorreoService()

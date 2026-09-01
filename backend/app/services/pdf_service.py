@@ -1,3 +1,8 @@
+# ============================================================
+# PDF SERVICE
+# Arma el recibo en PDF con la libreria fpdf2.
+# Se adjunta al correo que recibe el cliente al comprar.
+# ============================================================
 from datetime import datetime
 
 from fpdf import FPDF
@@ -8,12 +13,17 @@ GRIS = (110, 110, 110)
 GRIS_CLARO = (238, 238, 238)
 
 
+
+# ---------------- Limpiar texto para el PDF ----------------
+# Las fuentes basicas de PDF solo aceptan latin-1
 def _texto(valor):
     if valor is None:
         return ""
     return str(valor).encode("latin-1", "replace").decode("latin-1")
 
 
+
+# ---------------- Formato de dinero y fechas ----------------
 def _dinero(valor):
     return "$" + format(float(valor or 0), ",.2f")
 
@@ -27,6 +37,8 @@ def _fecha(valor):
         return _texto(valor)
 
 
+
+# ---------------- Plantilla del documento ----------------
 class ReciboPDF(FPDF):
 
     def __init__(self, codigo_pedido):
@@ -34,6 +46,8 @@ class ReciboPDF(FPDF):
         self.codigo_pedido = codigo_pedido
         self.set_auto_page_break(auto=True, margin=20)
 
+
+# ---------------- Cabecera de cada pagina ----------------
     def header(self):
         self.set_font("Helvetica", "B", 22)
         self.set_text_color(*NEGRO)
@@ -48,6 +62,8 @@ class ReciboPDF(FPDF):
         self.line(10, self.get_y() + 2, 200, self.get_y() + 2)
         self.ln(8)
 
+
+# ---------------- Pie de cada pagina ----------------
     def footer(self):
         self.set_y(-18)
         self.set_font("Helvetica", "", 8)
@@ -58,8 +74,12 @@ class ReciboPDF(FPDF):
                   align="C")
 
 
+
+# ---------------- El servicio que arma el recibo ----------------
 class PdfService:
 
+
+# ---------------- Armar el PDF completo ----------------
     def generar_recibo(self, pedido):
         pdf = ReciboPDF(_texto(pedido.get("codigo_pedido", "")))
         pdf.add_page()
@@ -72,6 +92,8 @@ class PdfService:
 
         return bytes(pdf.output())
 
+
+# ---------------- Titulo y codigo del pedido ----------------
     def _titulo(self, pdf, pedido):
         pdf.set_font("Helvetica", "B", 14)
         pdf.set_text_color(*NEGRO)
@@ -89,6 +111,8 @@ class PdfService:
                  new_x="LMARGIN", new_y="NEXT")
         pdf.ln(4)
 
+
+# ---------------- Datos de entrega ----------------
     def _datos_cliente(self, pdf, pedido):
         filas = [
             ("Cliente", pedido.get("cliente")),
@@ -115,6 +139,8 @@ class PdfService:
 
         pdf.ln(4)
 
+
+# ---------------- Tabla de productos comprados ----------------
     def _tabla_productos(self, pdf, detalles):
         pdf.set_font("Helvetica", "B", 11)
         pdf.set_text_color(*NEGRO)
@@ -155,6 +181,8 @@ class PdfService:
 
         pdf.ln(4)
 
+
+# ---------------- Subtotal, IVA y total ----------------
     def _totales(self, pdf, pedido):
         filas = [
             ("Subtotal", pedido.get("subtotal")),
@@ -183,6 +211,8 @@ class PdfService:
         pdf.cell(32, 9, _dinero(pedido.get("total")), align="R")
         pdf.ln(14)
 
+
+# ---------------- Mensaje final ----------------
     def _cierre(self, pdf):
         pdf.set_font("Helvetica", "B", 10)
         pdf.set_text_color(*NEGRO)

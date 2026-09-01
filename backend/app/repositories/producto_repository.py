@@ -1,3 +1,9 @@
+# ============================================================
+# PRODUCTO REPOSITORY
+# Consultas del catalogo, el inventario y las tallas.
+# Aqui esta la fabrica que convierte una fila de SQL en el
+# objeto correcto: Hoodie, Pantalon o Accesorio.
+# ============================================================
 from app.models.accesorio import Accesorio
 from app.models.categoria import Categoria
 from app.models.hoodie import Hoodie
@@ -6,6 +12,9 @@ from app.models.talla import ProductoTalla, Talla
 from app.repositories.base_repository import BaseRepository
 from app.utils.excepciones import ProductoNoEncontrado
 
+
+# ---------------- Consulta base de productos ----------------
+# Se reutiliza anadiendole el WHERE que haga falta
 SELECT_PRODUCTO = """
     SELECT p.id_producto, p.codigo, p.nombre, p.descripcion, p.precio,
            p.precio_oferta, p.imagen_principal, p.material, p.genero,
@@ -15,6 +24,8 @@ SELECT_PRODUCTO = """
 """
 
 
+
+# ---------------- La clase ----------------
 class ProductoRepository(BaseRepository):
 
     @property
@@ -25,6 +36,9 @@ class ProductoRepository(BaseRepository):
     def clave_primaria(self):
         return "id_producto"
 
+
+# ---------------- Fabrica de productos ----------------
+# Segun la categoria crea un Hoodie, un Pantalon o un Accesorio. Es polimorfismo
     def a_objeto(self, fila):
         if fila is None:
             return None
@@ -55,6 +69,8 @@ class ProductoRepository(BaseRepository):
         raise ProductoNoEncontrado(f"categoria desconocida: {categoria}")
 
     @staticmethod
+
+# ---------------- Sacar datos del texto del material ----------------
     def _gramaje(material):
         if not material:
             return 380
@@ -77,6 +93,8 @@ class ProductoRepository(BaseRepository):
                 return tipo
         return "Gorra"
 
+
+# ---------------- Buscar productos ----------------
     def obtener_por_id(self, id_producto):
         fila = self._consultar_uno(SELECT_PRODUCTO + " WHERE p.id_producto = %s",
                                    (id_producto,))
@@ -111,6 +129,9 @@ class ProductoRepository(BaseRepository):
             "ORDER BY p.codigo", (patron, patron, patron))
         return [self.a_objeto(f) for f in filas]
 
+
+# ---------------- Catalogo para la tienda ----------------
+# Usa la vista v_catalogo_publico, que agrupa el stock de todas las tallas
     def catalogo_publico(self, slug=None):
         sql = "SELECT * FROM v_catalogo_publico WHERE disponible = TRUE"
         parametros = ()
@@ -120,6 +141,8 @@ class ProductoRepository(BaseRepository):
         sql += " ORDER BY categoria, codigo"
         return self._consultar_todos(sql, parametros)
 
+
+# ---------------- Inventario de una talla concreta ----------------
     def obtener_inventario(self, id_producto_talla):
         fila = self._consultar_uno("""
             SELECT pt.id_producto_talla, pt.stock, pt.stock_minimo,
@@ -144,10 +167,15 @@ class ProductoRepository(BaseRepository):
         return ProductoTalla(fila["id_producto_talla"], producto, talla,
                              fila["stock"], fila["stock_minimo"])
 
+
+# ---------------- Preguntar si hay stock ----------------
+# Llama a la funcion fn_verificar_stock de PostgreSQL
     def hay_stock(self, id_producto_talla, cantidad):
         return self._consultar_valor("SELECT fn_verificar_stock(%s, %s) AS hay",
                                      (id_producto_talla, cantidad))
 
+
+# ---------------- Categorias con sus productos ----------------
     def obtener_categorias(self):
         filas = self._consultar_todos("""
             SELECT c.id_categoria, c.nombre, c.slug, c.descripcion,
@@ -166,6 +194,9 @@ class ProductoRepository(BaseRepository):
             categorias.append(categoria)
         return categorias
 
+
+# ---------------- Tallas de un producto con su stock ----------------
+# Esto es lo que necesita la ficha para mostrar S, M, L y XL
     def obtener_tallas_por_producto(self, id_producto):
         filas = self._consultar_todos("""
             SELECT pt.id_producto_talla, pt.stock, pt.stock_minimo,
@@ -186,6 +217,8 @@ class ProductoRepository(BaseRepository):
             for f in filas
         ]
 
+
+# ---------------- Busqueda por texto ----------------
     def catalogo_buscar(self, texto):
         patron = f"%{texto}%"
         return self._consultar_todos("""
@@ -202,6 +235,9 @@ class ProductoRepository(BaseRepository):
             LIMIT  %s
         """, (limite,))
 
+
+# ---------------- Inventario completo para el panel ----------------
+# Las 72 combinaciones, marcando cuales estan criticas o agotadas
     def inventario_completo(self):
         filas = self._consultar_todos("""
             SELECT p.codigo, p.nombre, c.nombre AS categoria,
@@ -240,6 +276,9 @@ class ProductoRepository(BaseRepository):
         """, (codigo_producto, codigo_talla))
         return dict(fila) if fila else None
 
+
+# ---------------- Reponer stock ----------------
+# Llama al procedimiento sp_reponer_stock, que valida y audita
     def reponer_stock(self, codigo_producto, codigo_talla, cantidad, id_administrador):
         from app.database import llamar_procedimiento
         llamar_procedimiento("sp_reponer_stock",

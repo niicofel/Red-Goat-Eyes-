@@ -1,3 +1,8 @@
+-- ============================================================
+-- 99 · BORRAR TODO
+-- Elimina toda la estructura para reinstalar desde cero.
+-- OJO: esto borra los datos. Solo usar en desarrollo.
+-- ============================================================
 DO $$
 BEGIN
     IF current_setting('rge.confirmo_borrado', TRUE) IS DISTINCT FROM 'SI_BORRAR_TODO' THEN

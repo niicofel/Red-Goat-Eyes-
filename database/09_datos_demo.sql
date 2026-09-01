@@ -1,10 +1,21 @@
+-- ============================================================
+-- 09 · DATOS DE LA DEMOSTRACION
+-- Deja la tienda limpia y con el catalogo por tallas:
+-- hoodies y pantalones en S, M, L y XL, accesorios en talla
+-- unica, 20 unidades cada una, y un solo administrador.
+-- ============================================================
 BEGIN;
 
+
+-- ---------------- Limpieza ----------------
+-- Los pedidos van primero porque pedido -> cliente es RESTRICT
 DELETE FROM pedido;
 DELETE FROM mensaje_contacto;
 DELETE FROM usuario;
 
 
+
+-- ---------------- Administrador unico ----------------
 INSERT INTO usuario (email, password_hash, rol, activo)
 VALUES ('fc762798@gmail.com',
         '$2b$12$6Z099j1VCS4HWeuDoOesV.2/GoMwTl4hy0F8kSYobgPR6hMVvXQjy',
@@ -17,6 +28,9 @@ FROM   usuario
 WHERE  email = 'fc762798@gmail.com';
 
 
+
+-- ---------------- Tallas del catalogo ----------------
+-- Borra la talla unica de hoodies y pantalones y pone S, M, L y XL
 DELETE FROM producto_talla pt
 USING  producto p, categoria c
 WHERE  pt.id_producto  = p.id_producto
@@ -42,6 +56,8 @@ WHERE  pt.id_producto = p.id_producto
 
 
 
+
+-- ---------------- Comprobacion final ----------------
 SELECT 'usuarios'          AS elemento, COUNT(*)::TEXT AS valor FROM usuario
 UNION ALL
 SELECT 'pedidos',          COUNT(*)::TEXT FROM pedido

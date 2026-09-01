@@ -1,6 +1,14 @@
+# ============================================================
+# TALLA y PRODUCTO_TALLA
+# Talla es el catalogo de tallas (XS a XXL y U de unica).
+# ProductoTalla une un producto con una talla y guarda su stock.
+# Es la pieza clave del inventario: el stock no vive en Producto.
+# ============================================================
 from app.utils.excepciones import ErrorValidacion
 
 
+
+# ---------------- Catalogo de tallas ----------------
 class Talla:
 
     CODIGOS_VALIDOS = ("XS", "S", "M", "L", "XL", "XXL", "U")
@@ -72,6 +80,8 @@ class Talla:
         return self._orden < otra._orden
 
 
+
+# ---------------- Inventario de una talla concreta ----------------
 class ProductoTalla:
 
     def __init__(self, id_producto_talla, producto, talla, stock=0, stock_minimo=3):
@@ -94,6 +104,8 @@ class ProductoTalla:
         return self._talla
 
     @property
+
+# ---------------- Stock con validacion ----------------
     def stock(self):
         return self._stock
 
@@ -116,6 +128,9 @@ class ProductoTalla:
         self._stock_minimo = cantidad
 
     @property
+
+# ---------------- Estado del inventario ----------------
+# critico cuando el stock baja del minimo, agotado cuando llega a cero
     def disponible(self):
         return self._stock > 0
 
@@ -127,6 +142,8 @@ class ProductoTalla:
     def agotado(self):
         return self._stock == 0
 
+
+# ---------------- Comprobar, descontar y reponer unidades ----------------
     def hay_stock(self, cantidad):
         return self._stock >= cantidad
 

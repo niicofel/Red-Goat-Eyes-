@@ -1,3 +1,9 @@
+# ============================================================
+# RUTAS DE PRODUCTOS
+# Catalogo, detalle, disponibilidad, inventario y reposicion.
+# OJO con el orden: /<codigo> va al final, porque si no
+# capturaria /inventario como si fuera un codigo de producto.
+# ============================================================
 from flask import Blueprint, jsonify, request
 
 from app.routes.sesion import requiere_admin, usuario_actual
@@ -7,6 +13,8 @@ productos_bp = Blueprint("productos", __name__, url_prefix="/api/productos")
 _servicio = ProductoService()
 
 
+
+# ---------------- Listar el catalogo ----------------
 @productos_bp.get("")
 def listar():
     slug = request.args.get("categoria")
@@ -18,12 +26,16 @@ def listar():
     return jsonify({"total": len(datos), "productos": datos})
 
 
+
+# ---------------- Productos destacados ----------------
 @productos_bp.get("/destacados")
 def destacados():
     datos = _servicio.destacados()
     return jsonify({"total": len(datos), "productos": datos})
 
 
+
+# ---------------- Inventario completo (solo admin) ----------------
 @productos_bp.get("/inventario")
 @requiere_admin()
 def inventario():
@@ -36,6 +48,8 @@ def inventario():
     })
 
 
+
+# ---------------- Reponer stock (admin nivel 2) ----------------
 @productos_bp.post("/reponer")
 @requiere_admin(nivel_minimo=2)
 def reponer():
@@ -51,6 +65,8 @@ def reponer():
     return jsonify({"mensaje": "Stock repuesto", "producto": resultado})
 
 
+
+# ---------------- Comprobar stock de una talla ----------------
 @productos_bp.get("/disponibilidad/<int:id_producto_talla>")
 def disponibilidad(id_producto_talla):
     cantidad = request.args.get("cantidad", 1, type=int)
@@ -61,6 +77,9 @@ def disponibilidad(id_producto_talla):
     })
 
 
+
+# ---------------- Detalle de un producto ----------------
+# Va al final para no capturar las rutas de arriba
 @productos_bp.get("/<codigo>")
 def detalle(codigo):
     return jsonify(_servicio.detalle(codigo))

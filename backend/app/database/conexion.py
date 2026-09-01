@@ -1,3 +1,9 @@
+# ============================================================
+# CONEXION
+# Maneja las conexiones a PostgreSQL con dos pools.
+# Un pool es un grupo de conexiones ya abiertas y listas para usar,
+# porque abrir una conexion cada vez seria lento.
+# ============================================================
 import atexit
 import logging
 
@@ -14,6 +20,8 @@ _pool = None
 _pool_admin = None
 
 
+
+# ---------------- Error propio de base de datos ----------------
 class ErrorBaseDatos(ErrorRedGoatEyes):
 
     def __init__(self, mensaje, original=None):
@@ -21,6 +29,8 @@ class ErrorBaseDatos(ErrorRedGoatEyes):
         self.original = original
 
 
+
+# ---------------- Abrir el pool normal (rge_flask) ----------------
 def iniciar_pool():
     global _pool
     if _pool is not None:
@@ -39,6 +49,9 @@ def iniciar_pool():
     return _pool
 
 
+
+# ---------------- Abrir el pool administrativo (rge_panel) ----------------
+# Se necesita porque rge_flask no puede leer los reportes
 def iniciar_pool_admin():
     global _pool_admin
     if _pool_admin is not None:
@@ -57,6 +70,8 @@ def iniciar_pool_admin():
     return _pool_admin
 
 
+
+# ---------------- Cerrar los pools al apagar ----------------
 def cerrar_pool():
     global _pool, _pool_admin
     if _pool is not None:
@@ -72,6 +87,8 @@ def cerrar_pool():
 atexit.register(cerrar_pool)
 
 
+
+# ---------------- Pedir una conexion prestada ----------------
 def obtener_conexion():
     if _pool is None:
         iniciar_pool()
@@ -84,6 +101,8 @@ def obtener_conexion_admin():
     return _pool_admin.connection()
 
 
+
+# ---------------- Consultas por el pool administrativo ----------------
 def consultar_todos_admin(sql, parametros=None):
     try:
         with obtener_conexion_admin() as con:
@@ -106,6 +125,9 @@ def consultar_uno_admin(sql, parametros=None):
         raise _traducir(error) from error
 
 
+
+# ---------------- Traducir errores de PostgreSQL ----------------
+# Convierte errores tecnicos en mensajes que el usuario entienda
 def _traducir(error):
     if isinstance(error, psycopg.errors.UniqueViolation):
         return ErrorBaseDatos("Ya existe un registro con esos datos", error)
@@ -127,6 +149,8 @@ def _mensaje_limpio(error):
     return texto.split("\n")[0]
 
 
+
+# ---------------- Consultas normales ----------------
 def consultar_todos(sql, parametros=None):
     try:
         with obtener_conexion() as con:
@@ -156,6 +180,8 @@ def consultar_valor(sql, parametros=None):
     return next(iter(fila.values()))
 
 
+
+# ---------------- INSERT, UPDATE y DELETE ----------------
 def ejecutar(sql, parametros=None, devolver=False):
     try:
         with obtener_conexion() as con:
@@ -169,6 +195,8 @@ def ejecutar(sql, parametros=None, devolver=False):
         raise _traducir(error) from error
 
 
+
+# ---------------- Llamar a un procedimiento almacenado ----------------
 def llamar_procedimiento(nombre, parametros=None):
     marcadores = ", ".join(["%s"] * len(parametros or ()))
     sql = f"CALL {nombre}({marcadores})"
@@ -184,6 +212,8 @@ def llamar_procedimiento(nombre, parametros=None):
         raise _traducir(error) from error
 
 
+
+# ---------------- Comprobar que la base responde ----------------
 def probar_conexion():
     try:
         fila = consultar_uno("SELECT current_user AS usuario, version() AS motor")

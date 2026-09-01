@@ -1,8 +1,15 @@
+# ============================================================
+# PEDIDO REPOSITORY
+# Consultas de pedidos, sus detalles y la cola de correos.
+# ============================================================
 import json
 
 from app.repositories.base_repository import BaseRepository
 from app.utils.excepciones import CarritoVacio
 
+
+# ---------------- Consulta base de pedidos ----------------
+# Une pedido con estado, metodo de pago, cliente y direccion
 SELECT_PEDIDO = """
     SELECT p.id_pedido, p.codigo_pedido, p.fecha_pedido, p.subtotal, p.iva,
            p.costo_envio, p.total, p.observaciones,
@@ -20,6 +27,8 @@ SELECT_PEDIDO = """
 """
 
 
+
+# ---------------- La clase ----------------
 class PedidoRepository(BaseRepository):
 
     @property
@@ -30,6 +39,9 @@ class PedidoRepository(BaseRepository):
     def clave_primaria(self):
         return "id_pedido"
 
+
+# ---------------- Convertir la fila en diccionario ----------------
+# Los montos pasan a float para que la API pueda mandarlos como JSON
     def a_objeto(self, fila):
         if fila is None:
             return None
@@ -44,6 +56,8 @@ class PedidoRepository(BaseRepository):
         return datos
 
     @staticmethod
+
+# ---------------- Armar la direccion como texto ----------------
     def _formato_direccion(fila):
         partes = [fila["calle_principal"]]
         if fila.get("numeracion"):
@@ -55,6 +69,9 @@ class PedidoRepository(BaseRepository):
             texto += ", " + fila["ciudad"]
         return texto
 
+
+# ---------------- Registrar un pedido ----------------
+# Llama a sp_registrar_pedido: crea el pedido y sus detalles de una sola vez
     def registrar(self, id_cliente, id_direccion, id_metodo_pago, items,
                   observaciones=None):
         if not items:
@@ -73,6 +90,8 @@ class PedidoRepository(BaseRepository):
 
         return salida.get("p_codigo_pedido") if salida else None
 
+
+# ---------------- Buscar un pedido con sus lineas ----------------
     def obtener_por_codigo(self, codigo):
         fila = self._consultar_uno(SELECT_PEDIDO + " WHERE p.codigo_pedido = %s",
                                    (codigo,))
@@ -81,6 +100,8 @@ class PedidoRepository(BaseRepository):
             pedido["detalles"] = self.obtener_detalles(fila["id_pedido"])
         return pedido
 
+
+# ---------------- Lineas de un pedido ----------------
     def obtener_detalles(self, id_pedido):
         filas = self._consultar_todos("""
             SELECT d.id_detalle, d.cantidad, d.precio_unitario, d.descuento,
@@ -98,23 +119,32 @@ class PedidoRepository(BaseRepository):
                  "descuento": float(f["descuento"]),
                  "subtotal_linea": float(f["subtotal_linea"])} for f in filas]
 
+
+# ---------------- Historial de un cliente ----------------
     def obtener_por_cliente(self, id_cliente, limite=20):
         filas = self._consultar_todos(
             SELECT_PEDIDO + " WHERE p.id_cliente = %s ORDER BY p.fecha_pedido DESC LIMIT %s",
             (id_cliente, limite))
         return [self.a_objeto(f) for f in filas]
 
+
+# ---------------- Todos los pedidos (panel de administracion) ----------------
     def obtener_todos(self, limite=100):
         filas = self._consultar_todos(
             SELECT_PEDIDO + " ORDER BY p.fecha_pedido DESC LIMIT %s", (limite,))
         return [self.a_objeto(f) for f in filas]
 
+
+# ---------------- Cambiar el estado de un pedido ----------------
+# El procedimiento valida que la transicion sea permitida
     def cambiar_estado(self, codigo_pedido, nuevo_estado, id_administrador=None):
         from app.database import llamar_procedimiento
         llamar_procedimiento("sp_cambiar_estado_pedido",
                              (codigo_pedido, nuevo_estado, id_administrador))
         return True
 
+
+# ---------------- Catalogos de apoyo ----------------
     def obtener_metodos_pago(self):
         return self._consultar_todos(
             "SELECT id_metodo, nombre FROM metodo_pago WHERE activo = TRUE ORDER BY id_metodo")
@@ -123,6 +153,9 @@ class PedidoRepository(BaseRepository):
         return self._consultar_todos(
             "SELECT id_estado, nombre, descripcion FROM estado_pedido ORDER BY orden")
 
+
+# ---------------- Cola de correos ----------------
+# Los correos que el trigger dejo pendientes de enviar
     def correos_pendientes(self, limite=20):
         return self._consultar_todos("""
             SELECT e.id_envio, e.id_pedido, e.destinatario, e.asunto, e.intentos,
@@ -134,6 +167,8 @@ class PedidoRepository(BaseRepository):
             LIMIT  %s
         """, (limite,))
 
+
+# ---------------- Marcar el resultado del envio ----------------
     def marcar_correo_enviado(self, id_envio):
         return self._ejecutar("""
             UPDATE envio_correo

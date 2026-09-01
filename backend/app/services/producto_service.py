@@ -1,12 +1,21 @@
+# ============================================================
+# PRODUCTO SERVICE
+# Reglas del catalogo, el detalle y la reposicion de stock.
+# ============================================================
 from app.repositories.producto_repository import ProductoRepository
 from app.utils.excepciones import ErrorValidacion, ProductoNoEncontrado
 
 
+
+# ---------------- La clase ----------------
 class ProductoService:
 
     def __init__(self, repositorio=None):
         self._repo = repositorio or ProductoRepository()
 
+
+# ---------------- Catalogo, busqueda y destacados ----------------
+# Los tres devuelven la misma forma de datos para que el JavaScript no cambie
     def catalogo(self, slug=None):
         return [self._formatear(f) for f in self._repo.catalogo_publico(slug)]
 
@@ -18,6 +27,9 @@ class ProductoService:
     def destacados(self, limite=8):
         return [self._formatear(f) for f in self._repo.catalogo_destacados(limite)]
 
+
+# ---------------- Preparar un producto para la API ----------------
+# El precio sale del modelo, no de SQL, para que coincida con lo que se cobra
     def _formatear(self, fila):
         tallas = fila.get("tallas") or ""
         producto = self._repo.a_objeto(fila)
@@ -44,6 +56,8 @@ class ProductoService:
             "destacado": fila["destacado"],
         }
 
+
+# ---------------- Detalle de un producto con sus tallas ----------------
     def detalle(self, codigo):
         producto = self._repo.obtener_por_codigo(codigo)
         if producto is None:
@@ -56,6 +70,8 @@ class ProductoService:
         datos["tallas_disponibles"] = sum(1 for t in datos["tallas"] if t["disponible"])
         return datos
 
+
+# ---------------- Categorias con su rango de precios ----------------
     def categorias(self):
         salida = []
         for categoria in self._repo.obtener_categorias():
@@ -65,15 +81,22 @@ class ProductoService:
             salida.append(datos)
         return salida
 
+
+# ---------------- Comprobar stock ----------------
     def verificar_disponibilidad(self, id_producto_talla, cantidad):
         return bool(self._repo.hay_stock(id_producto_talla, cantidad))
 
     def inventario(self, id_producto_talla):
         return self._repo.obtener_inventario(id_producto_talla).a_diccionario()
 
+
+# ---------------- Inventario para el panel ----------------
     def inventario_completo(self):
         return self._repo.inventario_completo()
 
+
+# ---------------- Reponer stock ----------------
+# Valida la cantidad y despues llama al procedimiento de PostgreSQL
     def reponer_stock(self, codigo_producto, codigo_talla, cantidad, id_administrador):
         if not codigo_producto:
             raise ErrorValidacion("codigo_producto", "Indique el codigo del producto")

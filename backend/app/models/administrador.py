@@ -1,9 +1,18 @@
+# ============================================================
+# ADMINISTRADOR
+# Hereda de Persona. Anade cargo y nivel de acceso (1 a 3).
+# El nivel decide que puede hacer.
+# ============================================================
 from app.models.persona import Persona
 from app.utils.excepciones import ErrorValidacion, PermisoDenegado
 
 
+
+# ---------------- La clase ----------------
 class Administrador(Persona):
 
+
+# ---------------- Los tres niveles ----------------
     NIVEL_CONSULTA = 1
     NIVEL_GESTION = 2
     NIVEL_TOTAL = 3
@@ -14,6 +23,8 @@ class Administrador(Persona):
         NIVEL_TOTAL: "Total",
     }
 
+
+# ---------------- Constructor ----------------
     def __init__(self, id_usuario, nombres, apellidos, email,
                  cargo="Operador", nivel_acceso=NIVEL_CONSULTA, activo=True):
         super().__init__(id_usuario, nombres, apellidos, email, activo)
@@ -21,6 +32,8 @@ class Administrador(Persona):
         self.nivel_acceso = nivel_acceso
 
     @property
+
+# ---------------- Cargo y nivel con validacion ----------------
     def cargo(self):
         return self._cargo
 
@@ -46,6 +59,8 @@ class Administrador(Persona):
     def nombre_nivel(self):
         return self.NOMBRES_NIVEL[self._nivel_acceso]
 
+
+# ---------------- Que puede hacer segun su nivel ----------------
     def puede_ver_reportes(self):
         return self.activo
 
@@ -61,6 +76,9 @@ class Administrador(Persona):
     def puede_gestionar_usuarios(self):
         return self.activo and self._nivel_acceso >= self.NIVEL_TOTAL
 
+
+# ---------------- Comprobar un permiso ----------------
+# Si no tiene nivel suficiente lanza PermisoDenegado
     def exigir(self, accion):
         comprobaciones = {
             "ver_reportes": self.puede_ver_reportes,
@@ -76,6 +94,8 @@ class Administrador(Persona):
             raise PermisoDenegado(accion, self.NIVEL_GESTION)
         return True
 
+
+# ---------------- Rol y permisos del administrador ----------------
     def obtener_rol(self):
         return "administrador"
 

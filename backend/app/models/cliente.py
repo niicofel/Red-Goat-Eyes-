@@ -1,14 +1,23 @@
+# ============================================================
+# CLIENTE
+# Hereda de Persona. Anade cedula, telefono, ciudad y direcciones.
+# Aqui esta la validacion de la cedula ecuatoriana.
+# ============================================================
 from datetime import date
 
 from app.models.persona import Persona
 from app.utils.excepciones import ErrorValidacion
 
 
+
+# ---------------- La clase ----------------
 class Cliente(Persona):
 
     PROVINCIAS_VALIDAS = tuple(range(1, 25)) + (30,)
     COEFICIENTES = (2, 1, 2, 1, 2, 1, 2, 1, 2)
 
+
+# ---------------- Constructor ----------------
     def __init__(self, id_usuario, nombres, apellidos, email, cedula=None,
                  telefono=None, fecha_nacimiento=None, ciudad=None,
                  id_ciudad=None, activo=True):
@@ -21,6 +30,8 @@ class Cliente(Persona):
         self._direcciones = []
 
     @property
+
+# ---------------- Cedula con validacion ----------------
     def cedula(self):
         return self._cedula
 
@@ -37,6 +48,9 @@ class Cliente(Persona):
         self._cedula = texto
 
     @classmethod
+
+# ---------------- Algoritmo del digito verificador ----------------
+# Multiplica los 9 primeros digitos y compara el resultado con el decimo
     def _cedula_valida(cls, cedula):
         provincia = int(cedula[:2])
         if provincia not in cls.PROVINCIAS_VALIDAS:
@@ -51,6 +65,8 @@ class Cliente(Persona):
         return verificador == int(cedula[9])
 
     @property
+
+# ---------------- Telefono ----------------
     def telefono(self):
         return self._telefono
 
@@ -66,6 +82,8 @@ class Cliente(Persona):
         self._telefono = texto
 
     @property
+
+# ---------------- Fecha de nacimiento y edad ----------------
     def fecha_nacimiento(self):
         return self._fecha_nacimiento
 
@@ -104,6 +122,8 @@ class Cliente(Persona):
         return self._id_ciudad
 
     @property
+
+# ---------------- Direcciones del cliente ----------------
     def direcciones(self):
         return tuple(self._direcciones)
 
@@ -114,6 +134,9 @@ class Cliente(Persona):
                 return direccion
         return self._direcciones[0] if self._direcciones else None
 
+
+# ---------------- Agregar y quitar direcciones ----------------
+# Si es la primera, se marca como principal automaticamente
     def agregar_direccion(self, direccion):
         if direccion in self._direcciones:
             return False
@@ -130,9 +153,13 @@ class Cliente(Persona):
         self._direcciones = [d for d in self._direcciones if d.id_direccion != id_direccion]
         return len(self._direcciones) < antes
 
+
+# ---------------- Puede comprar si esta activo y tiene datos ----------------
     def puede_comprar(self):
         return self.activo and self._cedula is not None and len(self._direcciones) > 0
 
+
+# ---------------- Rol y permisos del cliente ----------------
     def obtener_rol(self):
         return "cliente"
 
