@@ -1,3 +1,8 @@
+-- ============================================================
+-- 02 · DATOS INICIALES
+-- Carga provincias, ciudades, categorias, tallas y los 24
+-- productos. Tambien crea usuarios y pedidos de ejemplo.
+-- ============================================================
 INSERT INTO provincia (nombre) VALUES
     ('Azuay'),
     ('Bolivar'),

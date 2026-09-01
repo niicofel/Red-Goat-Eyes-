@@ -1,8 +1,16 @@
+# ============================================================
+# SESION
+# Maneja quien esta conectado y los decoradores que protegen
+# las rutas. Un decorador es codigo que se ejecuta ANTES de
+# entrar a la funcion.
+# ============================================================
 from functools import wraps
 
 from flask import jsonify, session
 
 
+
+# ---------------- Saber quien esta conectado ----------------
 def usuario_actual():
     if "id_usuario" not in session:
         return None
@@ -15,6 +23,8 @@ def usuario_actual():
     }
 
 
+
+# ---------------- Abrir y cerrar sesion ----------------
 def abrir_sesion(usuario):
     session.clear()
     session["id_usuario"] = usuario.id_usuario
@@ -29,6 +39,9 @@ def cerrar_sesion():
     session.clear()
 
 
+
+# ---------------- Proteger una ruta: hay que tener sesion ----------------
+# Devuelve 401 si no hay nadie conectado
 def requiere_sesion(funcion):
     @wraps(funcion)
     def envoltura(*args, **kwargs):
@@ -39,6 +52,9 @@ def requiere_sesion(funcion):
     return envoltura
 
 
+
+# ---------------- Proteger una ruta: hay que ser administrador ----------------
+# Devuelve 403. Se le puede pedir un nivel minimo, por ejemplo 2
 def requiere_admin(nivel_minimo=1):
     def decorador(funcion):
         @wraps(funcion)

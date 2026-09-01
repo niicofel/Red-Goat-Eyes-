@@ -1,8 +1,15 @@
+# ============================================================
+# HOODIE
+# Un hoodie con gramaje de 400 gsm o mas se considera premium
+# y cuesta 10% mas.
+# ============================================================
 from decimal import Decimal, ROUND_HALF_UP
 
 from app.models.producto import Producto
 
 
+
+# ---------------- La clase ----------------
 class Hoodie(Producto):
 
     GRAMAJE_PREMIUM = 400
@@ -30,6 +37,8 @@ class Hoodie(Producto):
     def es_premium(self):
         return self._gramaje >= self.GRAMAJE_PREMIUM
 
+
+# ---------------- Precio con recargo premium ----------------
     def calcular_precio_final(self):
         base = self.precio_venta
         if self.es_premium:

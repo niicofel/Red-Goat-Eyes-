@@ -1,3 +1,11 @@
+-- ============================================================
+-- 08 · PERMISOS ESPECIALES
+-- Algunas funciones necesitan escribir en tablas donde el rol
+-- de la aplicacion no tiene permiso. En vez de darle mas
+-- permisos a toda la aplicacion, solo estas funciones se
+-- ejecutan con los permisos de su dueno.
+-- IMPORTANTE: se ejecuta como postgres.
+-- ============================================================
 ALTER FUNCTION fn_trg_encolar_correo()
     SECURITY DEFINER
     SET search_path = public, pg_temp;

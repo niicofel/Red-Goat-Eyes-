@@ -1,3 +1,9 @@
+# ============================================================
+# EXCEPCIONES
+# Errores propios del sistema. Cada uno tiene un codigo que
+# app/__init__.py traduce a un numero HTTP (400, 403, 409...).
+# ============================================================
+# ---------------- Error base del que heredan todos ----------------
 class ErrorRedGoatEyes(Exception):
 
     def __init__(self, mensaje, codigo=None):
@@ -12,6 +18,9 @@ class ErrorRedGoatEyes(Exception):
         return f"[{self.codigo}] {self.mensaje}"
 
 
+
+# ---------------- Dato invalido (400) ----------------
+# Guarda el nombre del campo para que el JavaScript sepa donde poner el mensaje
 class ErrorValidacion(ErrorRedGoatEyes):
 
     def __init__(self, campo, mensaje):
@@ -24,6 +33,8 @@ class ErrorValidacion(ErrorRedGoatEyes):
         return datos
 
 
+
+# ---------------- No hay unidades suficientes (409) ----------------
 class StockInsuficiente(ErrorRedGoatEyes):
 
     def __init__(self, producto, solicitado, disponible):
@@ -35,6 +46,8 @@ class StockInsuficiente(ErrorRedGoatEyes):
         self.disponible = disponible
 
 
+
+# ---------------- Producto que no existe (404) ----------------
 class ProductoNoEncontrado(ErrorRedGoatEyes):
 
     def __init__(self, identificador):
@@ -42,12 +55,16 @@ class ProductoNoEncontrado(ErrorRedGoatEyes):
         self.identificador = identificador
 
 
+
+# ---------------- Usuario o clave incorrectos (401) ----------------
 class CredencialesInvalidas(ErrorRedGoatEyes):
 
     def __init__(self):
         super().__init__("El correo o la contraseña no son correctos", "CREDENCIALES_INVALIDAS")
 
 
+
+# ---------------- Correo ya registrado (409) ----------------
 class UsuarioDuplicado(ErrorRedGoatEyes):
 
     def __init__(self, email):
@@ -55,6 +72,8 @@ class UsuarioDuplicado(ErrorRedGoatEyes):
         self.email = email
 
 
+
+# ---------------- Sin permisos para esa accion (403) ----------------
 class PermisoDenegado(ErrorRedGoatEyes):
 
     def __init__(self, accion, nivel_requerido=None):
@@ -64,6 +83,8 @@ class PermisoDenegado(ErrorRedGoatEyes):
         super().__init__(mensaje, "PERMISO_DENEGADO")
 
 
+
+# ---------------- Cambio de estado no permitido (409) ----------------
 class TransicionInvalida(ErrorRedGoatEyes):
 
     def __init__(self, estado_actual, estado_destino):
@@ -73,6 +94,8 @@ class TransicionInvalida(ErrorRedGoatEyes):
         self.estado_destino = estado_destino
 
 
+
+# ---------------- Carrito sin productos (400) ----------------
 class CarritoVacio(ErrorRedGoatEyes):
 
     def __init__(self):

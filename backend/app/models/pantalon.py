@@ -1,8 +1,15 @@
+# ============================================================
+# PANTALON
+# Los cortes Carpenter y Workwear llevan refuerzos y
+# cuestan 5% mas.
+# ============================================================
 from decimal import Decimal, ROUND_HALF_UP
 
 from app.models.producto import Producto
 
 
+
+# ---------------- La clase ----------------
 class Pantalon(Producto):
 
     CORTES_REFORZADOS = ("Carpenter", "Workwear")
@@ -30,6 +37,8 @@ class Pantalon(Producto):
     def lleva_refuerzos(self):
         return any(c.lower() in self._tipo_corte.lower() for c in self.CORTES_REFORZADOS)
 
+
+# ---------------- Precio con recargo por refuerzos ----------------
     def calcular_precio_final(self):
         base = self.precio_venta
         if self.lleva_refuerzos:

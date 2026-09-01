@@ -1,3 +1,7 @@
+# ============================================================
+# RUTAS DE CONTACTO
+# Recibe los mensajes del formulario y los deja ver al admin.
+# ============================================================
 from flask import Blueprint, jsonify, request
 
 from app.repositories.mensaje_repository import MensajeRepository
@@ -11,11 +15,15 @@ _repo = MensajeRepository()
 _correo = CorreoService()
 
 
+
+# ---------------- Asuntos disponibles ----------------
 @contacto_bp.get("/asuntos")
 def asuntos():
     return jsonify({"asuntos": _repo.obtener_asuntos()})
 
 
+
+# ---------------- Listar mensajes (solo admin) ----------------
 @contacto_bp.get("/mensajes")
 @requiere_admin()
 def mensajes():
@@ -24,6 +32,9 @@ def mensajes():
     return jsonify({"total": len(datos), "mensajes": datos})
 
 
+
+# ---------------- Recibir un mensaje ----------------
+# Lo guarda en la base y ademas avisa por correo al administrador
 @contacto_bp.post("")
 def enviar():
     datos = request.get_json(silent=True) or {}

@@ -1,3 +1,12 @@
+-- ============================================================
+-- 03 · FUNCIONES Y TRIGGERS
+-- Un trigger es codigo que PostgreSQL ejecuta solo cuando pasa
+-- algo en una tabla. Nadie los llama: saltan automaticamente.
+-- Aqui estan las reglas que deben cumplirse siempre, aunque el
+-- cambio no venga desde la aplicacion.
+-- ============================================================
+-- ---------------- Funciones de ayuda ----------------
+-- El IVA se define en un solo lugar: 15%
 CREATE OR REPLACE FUNCTION fn_tasa_iva()
 RETURNS NUMERIC(4,4)
 LANGUAGE sql
@@ -49,6 +58,9 @@ COMMENT ON FUNCTION fn_calcular_total_pedido(INT) IS 'Suma de las lineas de un p
 
 
 
+
+-- ---------------- Trigger: validar stock ----------------
+-- Rechaza la linea del pedido si no hay unidades suficientes
 CREATE OR REPLACE FUNCTION fn_trg_validar_stock()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -98,6 +110,9 @@ CREATE TRIGGER trg_validar_stock
     EXECUTE FUNCTION fn_trg_validar_stock();
 
 
+
+-- ---------------- Trigger: ajustar stock ----------------
+-- Descuenta al comprar y devuelve al borrar. Por eso el stock se recupera solo
 CREATE OR REPLACE FUNCTION fn_trg_ajustar_stock()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -143,6 +158,8 @@ CREATE TRIGGER trg_ajustar_stock
     EXECUTE FUNCTION fn_trg_ajustar_stock();
 
 
+
+-- ---------------- Trigger: recalcular totales ----------------
 CREATE OR REPLACE FUNCTION fn_trg_recalcular_pedido()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -184,6 +201,8 @@ CREATE TRIGGER trg_recalcular_pedido
 
 
 
+
+-- ---------------- Trigger: devolver stock al cancelar ----------------
 CREATE OR REPLACE FUNCTION fn_trg_devolver_stock_cancelacion()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -219,6 +238,8 @@ CREATE TRIGGER trg_devolver_stock_cancelacion
     EXECUTE FUNCTION fn_trg_devolver_stock_cancelacion();
 
 
+
+-- ---------------- Trigger: auditar cambios ----------------
 CREATE OR REPLACE FUNCTION fn_trg_auditar_producto()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -254,6 +275,9 @@ CREATE TRIGGER trg_auditar_producto
 
 
 
+
+-- ---------------- Trigger: encolar el recibo ----------------
+-- PostgreSQL no puede mandar correos, asi que solo deja el aviso en la cola
 CREATE OR REPLACE FUNCTION fn_trg_encolar_correo()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -302,6 +326,8 @@ CREATE TRIGGER trg_encolar_correo
 
 
 
+
+-- ---------------- Trigger: fecha del carrito ----------------
 CREATE OR REPLACE FUNCTION fn_trg_actualizar_carrito()
 RETURNS TRIGGER
 LANGUAGE plpgsql

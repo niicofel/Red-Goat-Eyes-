@@ -1,6 +1,12 @@
+# ============================================================
+# REPORTE SERVICE
+# Capa fina sobre el repositorio de reportes.
+# ============================================================
 from app.repositories.reporte_repository import ReporteRepository
 
 
+
+# ---------------- La clase ----------------
 class ReporteService:
 
     def __init__(self, repositorio=None):

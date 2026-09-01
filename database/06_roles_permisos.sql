@@ -1,3 +1,10 @@
+-- ============================================================
+-- 06 · ROLES Y PERMISOS
+-- Crea 7 roles: 4 que agrupan permisos y 3 que se conectan.
+-- La aplicacion nunca entra como superusuario.
+-- Los roles se crean SIN contrasena: eso va en el 07, que no
+-- se sube a Git.
+-- ============================================================
 DO $$
 DECLARE
     v_faltantes TEXT := '';

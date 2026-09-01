@@ -1,11 +1,22 @@
+# ============================================================
+# BASE REPOSITORY
+# Clase abstracta de la que heredan todos los repositorios.
+# Un repositorio es la capa que traduce entre objetos de Python
+# y consultas SQL. Los servicios piden objetos, no escriben SQL.
+# ============================================================
 from abc import ABC, abstractmethod
 
 from app.database import consultar_todos, consultar_uno, consultar_valor, ejecutar
 
 
+
+# ---------------- La clase base ----------------
 class BaseRepository(ABC):
 
     @property
+
+# ---------------- Lo que cada repositorio debe definir ----------------
+# El nombre de su tabla, su clave primaria y como armar el objeto
     @abstractmethod
     def tabla(self):
         pass
@@ -19,6 +30,8 @@ class BaseRepository(ABC):
     def a_objeto(self, fila):
         pass
 
+
+# ---------------- Atajos a las funciones de conexion ----------------
     def _consultar_todos(self, sql, parametros=None):
         return consultar_todos(sql, parametros)
 
@@ -31,6 +44,9 @@ class BaseRepository(ABC):
     def _ejecutar(self, sql, parametros=None, devolver=False):
         return ejecutar(sql, parametros, devolver)
 
+
+# ---------------- Operaciones comunes a todos ----------------
+# Al estar aqui, los 5 repositorios las heredan sin repetir codigo
     def contar(self):
         return self._consultar_valor(f"SELECT COUNT(*) AS n FROM {self.tabla}")
 

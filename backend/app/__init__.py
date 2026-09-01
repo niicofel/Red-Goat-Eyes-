@@ -1,3 +1,9 @@
+# ============================================================
+# CREATE APP
+# Arma la aplicacion Flask: configura las sesiones, abre la
+# conexion a la base, registra las rutas y los manejadores de
+# error. Tambien sirve el HTML, el CSS y las imagenes.
+# ============================================================
 import logging
 from datetime import timedelta
 
@@ -17,6 +23,8 @@ logging.basicConfig(
 log = logging.getLogger("red_goat_eyes")
 
 
+
+# ---------------- Armar la aplicacion ----------------
 def create_app():
     app = Flask(__name__,
                 static_folder=Config.CARPETA_ESTATICA,
@@ -40,6 +48,9 @@ def create_app():
     return app
 
 
+
+# ---------------- Servir las paginas HTML ----------------
+# Por eso todo corre en un solo servidor y las llamadas a /api funcionan
 def _registrar_paginas(app):
 
     @app.get("/")
@@ -62,6 +73,9 @@ def _registrar_paginas(app):
                         "base_de_datos": estado}), codigo
 
 
+
+# ---------------- Traducir errores a codigos HTTP ----------------
+# Convierte las excepciones propias en 400, 403, 409, etc.
 def _registrar_errores(app):
 
     @app.errorhandler(ErrorRedGoatEyes)

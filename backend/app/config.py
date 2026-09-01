@@ -1,14 +1,24 @@
+# ============================================================
+# CONFIG
+# Lee el archivo backend/.env y deja todo listo para usar.
+# Aqui estan las dos cadenas de conexion: la normal (rge_flask)
+# y la administrativa (rge_panel).
+# ============================================================
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv
 
+
+# ---------------- Rutas del proyecto ----------------
 RAIZ_BACKEND = Path(__file__).resolve().parent.parent
 RAIZ_PROYECTO = RAIZ_BACKEND.parent
 
 load_dotenv(RAIZ_BACKEND / ".env")
 
 
+
+# ---------------- Ayudantes para leer variables ----------------
 def _entero(clave, defecto):
     try:
         return int(os.getenv(clave, defecto))
@@ -30,6 +40,8 @@ def _decimal(clave, defecto):
         return float(defecto)
 
 
+
+# ---------------- La configuracion ----------------
 class Config:
 
     DB_HOST = os.getenv("DB_HOST", "localhost")
@@ -71,6 +83,9 @@ class Config:
     MAX_CONTENT_LENGTH = MAX_UPLOAD_MB * 1024 * 1024
 
     @classmethod
+
+# ---------------- Cadenas de conexion a PostgreSQL ----------------
+# Dos conexiones distintas porque usan roles con permisos diferentes
     def cadena_conexion(cls):
         return (
             f"host={cls.DB_HOST} "
@@ -91,6 +106,8 @@ class Config:
         )
 
     @classmethod
+
+# ---------------- Avisar si falta algo importante en el .env ----------------
     def validar(cls):
         faltantes = []
         if not cls.DB_CLAVE:

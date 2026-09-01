@@ -1,5 +1,8 @@
-
-
+-- ============================================================
+-- 07 · CREDENCIALES (PLANTILLA)
+-- Copiar este archivo como 07_credenciales.sql y poner las
+-- contrasenas reales. Ese archivo esta en .gitignore.
+-- ============================================================
 ALTER ROLE rge_flask    PASSWORD 'ESCRIBE_AQUI_LA_CLAVE_DE_FLASK';
 ALTER ROLE rge_panel    PASSWORD 'ESCRIBE_AQUI_LA_CLAVE_DEL_PANEL';
 ALTER ROLE rge_respaldo PASSWORD 'ESCRIBE_AQUI_LA_CLAVE_DE_RESPALDO';

@@ -1,3 +1,9 @@
+# ============================================================
+# PERSONA
+# Clase abstracta de la que heredan Cliente y Administrador.
+# Guarda lo que tienen en comun: nombre, correo y si esta activo.
+# No se puede crear una Persona directamente.
+# ============================================================
 from abc import ABC, abstractmethod
 from datetime import date
 import re
@@ -5,10 +11,14 @@ import re
 from app.utils.excepciones import ErrorValidacion
 
 
+
+# ---------------- La clase ----------------
 class Persona(ABC):
 
     REGEX_EMAIL = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]{2,}$")
 
+
+# ---------------- Constructor ----------------
     def __init__(self, id_usuario, nombres, apellidos, email, activo=True):
         self._id_usuario = id_usuario
         self.nombres = nombres
@@ -16,6 +26,9 @@ class Persona(ABC):
         self.email = email
         self._activo = activo
 
+
+# ---------------- Propiedades con validacion ----------------
+# Los setters revisan el dato antes de guardarlo
     @property
     def id_usuario(self):
         return self._id_usuario
@@ -65,12 +78,17 @@ class Persona(ABC):
     def iniciales(self):
         return f"{self._nombres[0]}{self._apellidos[0]}".upper()
 
+
+# ---------------- Activar y desactivar la cuenta ----------------
     def desactivar(self):
         self._activo = False
 
     def reactivar(self):
         self._activo = True
 
+
+# ---------------- Metodos que cada hijo debe implementar ----------------
+# Obligan a que Cliente y Administrador definan su rol y sus permisos
     @abstractmethod
     def obtener_rol(self):
         pass
@@ -79,6 +97,8 @@ class Persona(ABC):
     def permisos(self):
         pass
 
+
+# ---------------- Convertir a diccionario para la API ----------------
     def a_diccionario(self):
         return {
             "id_usuario": self._id_usuario,
@@ -90,6 +110,9 @@ class Persona(ABC):
             "activo": self._activo,
         }
 
+
+# ---------------- Metodos especiales de Python ----------------
+# Permiten comparar personas y mostrarlas como texto
     def __str__(self):
         return f"{self.nombre_completo} <{self._email}> ({self.obtener_rol()})"
 

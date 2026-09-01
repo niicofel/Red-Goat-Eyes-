@@ -1,13 +1,24 @@
+# ============================================================
+# PEDIDO
+# La compra completa. Contiene sus DetallePedido (composicion:
+# una linea no existe sin su pedido).
+# Tiene una maquina de estados que controla por donde puede pasar.
+# ============================================================
 from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
 
 from app.utils.excepciones import ErrorValidacion, TransicionInvalida
 
 
+
+# ---------------- La clase ----------------
 class Pedido:
 
     IVA = Decimal("0.15")
 
+
+# ---------------- Maquina de estados ----------------
+# Este diccionario dice a que estado puede pasar cada estado
     TRANSICIONES = {
         "Pendiente":      ("Pagado", "Cancelado"),
         "Pagado":         ("En preparacion", "Cancelado"),
@@ -17,6 +28,8 @@ class Pedido:
         "Cancelado":      (),
     }
 
+
+# ---------------- Constructor ----------------
     def __init__(self, id_pedido, codigo_pedido, cliente, direccion,
                  estado="Pendiente", metodo_pago=None, fecha_pedido=None,
                  costo_envio=0, observaciones=None):
@@ -88,6 +101,8 @@ class Pedido:
     def esta_pagado(self):
         return self._estado not in ("Pendiente", "Cancelado")
 
+
+# ---------------- Agregar y quitar lineas ----------------
     def agregar_detalle(self, detalle):
         for existente in self._detalles:
             if existente.producto_talla.id_producto_talla == detalle.producto_talla.id_producto_talla:
@@ -104,6 +119,9 @@ class Pedido:
         ]
         return len(self._detalles) < antes
 
+
+# ---------------- Calculos del pedido ----------------
+# Todo con Decimal para no perder centavos
     def calcular_subtotal(self):
         total = sum((d.subtotal_linea for d in self._detalles), Decimal("0"))
         return total.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
@@ -116,6 +134,9 @@ class Pedido:
         return (self.calcular_subtotal() + self.calcular_iva() + self._costo_envio).quantize(
             Decimal("0.01"), rounding=ROUND_HALF_UP)
 
+
+# ---------------- Cambio de estado ----------------
+# Rechaza cualquier transicion que no este en el diccionario
     def puede_pasar_a(self, nuevo_estado):
         return nuevo_estado in self.TRANSICIONES.get(self._estado, ())
 
@@ -136,12 +157,16 @@ class Pedido:
     def marcar_pagado(self):
         return self.cambiar_estado("Pagado")
 
+
+# ---------------- Datos para el correo del recibo ----------------
     def correo_destinatario(self):
         return self._cliente.email
 
     def asunto_recibo(self):
         return f"Recibo de tu pedido {self._codigo_pedido} | Red Goat Eyes"
 
+
+# ---------------- Convertir a diccionario para la API ----------------
     def a_diccionario(self):
         return {
             "id_pedido": self._id_pedido,
@@ -162,6 +187,9 @@ class Pedido:
             "detalles": [d.a_diccionario() for d in self._detalles],
         }
 
+
+# ---------------- Metodos especiales ----------------
+# len(pedido) da el numero de lineas, y se puede recorrer con for
     def __len__(self):
         return len(self._detalles)
 

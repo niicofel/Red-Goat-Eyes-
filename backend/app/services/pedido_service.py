@@ -1,3 +1,8 @@
+# ============================================================
+# PEDIDO SERVICE
+# Calcula totales y registra pedidos.
+# Todo el dinero se maneja con Decimal, nunca con float.
+# ============================================================
 from decimal import Decimal, ROUND_HALF_UP
 
 from app.config import Config
@@ -8,6 +13,8 @@ from app.utils.excepciones import (CarritoVacio, ErrorValidacion, PermisoDenegad
 from app.utils.validadores import validar_cantidad, validar_email, validar_entero
 
 
+
+# ---------------- La clase ----------------
 class PedidoService:
 
     IVA = Decimal(str(Config.IVA_PORCENTAJE))
@@ -17,6 +24,9 @@ class PedidoService:
         self._productos = producto_repo or ProductoRepository()
         self._usuarios = usuario_repo or UsuarioRepository()
 
+
+# ---------------- Calcular subtotal, IVA y total ----------------
+# Comprueba el stock de cada linea antes de sumar
     def calcular_totales(self, items):
         subtotal = Decimal("0")
         detalle = []
@@ -55,6 +65,9 @@ class PedidoService:
             "total": float(subtotal + iva),
         }
 
+
+# ---------------- Registrar un pedido ----------------
+# Un administrador no puede comprar porque pedido apunta a cliente
     def registrar(self, id_cliente, datos):
         items = datos.get("items") or []
         if not items:
@@ -88,6 +101,8 @@ class PedidoService:
         self._pedidos.cambiar_estado(codigo, "Pagado")
         return self._pedidos.obtener_por_codigo(codigo)
 
+
+# ---------------- Buscar o crear la direccion de entrega ----------------
     def _resolver_direccion(self, id_cliente, datos):
         existentes = self._usuarios.obtener_direcciones(id_cliente)
         calle = (datos.get("direccion") or "").strip()
@@ -114,6 +129,8 @@ class PedidoService:
                 return ciudad["id_ciudad"]
         raise ErrorValidacion("id_ciudad", "No se pudo determinar la ciudad de entrega")
 
+
+# ---------------- Consultas de pedidos ----------------
     def obtener(self, codigo):
         return self._pedidos.obtener_por_codigo(codigo)
 
@@ -126,5 +143,7 @@ class PedidoService:
     def metodos_pago(self):
         return self._pedidos.obtener_metodos_pago()
 
+
+# ---------------- Cambiar el estado de un pedido ----------------
     def cambiar_estado(self, codigo, nuevo_estado, id_administrador=None):
         return self._pedidos.cambiar_estado(codigo, nuevo_estado, id_administrador)

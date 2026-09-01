@@ -1,5 +1,13 @@
+// ============================================================
+// ADMIN.JS
+// Solo en admin.html. Llena las cinco pestanas del panel.
+// Todas las peticiones son de administrador; si entra un cliente
+// se bloquean las tablas.
+// ============================================================
 document.addEventListener("DOMContentLoaded", async function () {
 
+
+// ---------------- Cambio de pestanas ----------------
     const botones = document.querySelectorAll(".tab-btn");
     const paneles = document.querySelectorAll(".admin-panel");
 
@@ -26,6 +34,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     });
 
+
+// ---------------- Comprobar que sea administrador ----------------
+// Si no lo es, bloquea las tablas y avisa
     const sesion = await rgeCargarSesion();
 
     if (!sesion) {
@@ -57,6 +68,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         filtroInventario.addEventListener("change", cargarInventario);
     }
 
+
+// ---------------- Cargar todo en paralelo ----------------
+// Siete peticiones a la vez tardan lo que la mas lenta, no la suma
     await Promise.all([
         cargarResumen(),
         cargarVentas(),
@@ -67,6 +81,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         cargarMensajes()
     ]);
 
+
+// ---------------- Tarjetas de indicadores ----------------
+// Productos, clientes, pedidos, mensajes y alertas de stock
     async function cargarResumen() {
         const caja = document.getElementById("resumen-admin");
 
@@ -115,6 +132,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+
+// ---------------- Reporte de ventas por categoria ----------------
+// Se puede filtrar por fechas
     async function cargarVentas() {
         const desde = valorCampo("rpt1-desde");
         const hasta = valorCampo("rpt1-hasta");
@@ -140,6 +160,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+
+// ---------------- Reporte de ranking de clientes ----------------
     async function cargarClientes() {
         await llenar("tabla-rpt2", "/reportes/clientes", "filas", function (fila) {
             return [
@@ -153,6 +175,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+
+// ---------------- Tabla de productos ----------------
     async function cargarProductos() {
         await llenar("tabla-productos", "/productos", "productos", function (fila) {
             return [
@@ -166,6 +190,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+
+// ---------------- Inventario por talla ----------------
+// Las 72 combinaciones. Resalta en amarillo las criticas y en rojo las agotadas
     async function cargarInventario() {
         const tabla = document.getElementById("tabla-inventario");
 
@@ -252,6 +279,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+
+// ---------------- Llenar el menu de tallas del formulario ----------------
     function llenarSelectTallas(inventario) {
         const select = document.getElementById("reponer-talla");
 
@@ -275,6 +304,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+
+// ---------------- Rellenar el formulario al pulsar Reponer ----------------
     function prepararReposicion(registro) {
         escribirCampo("reponer-codigo", registro.codigo);
         escribirCampo("reponer-talla", registro.talla);
@@ -293,6 +324,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+
+// ---------------- Reponer stock ----------------
+// Llama a la API, que a su vez llama al procedimiento sp_reponer_stock
     async function reponerStock(evento) {
         evento.preventDefault();
 
@@ -332,6 +366,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+
+// ---------------- Tabla de todos los pedidos ----------------
     async function cargarPedidos() {
         await llenar("tabla-pedidos", "/pedidos/todos", "pedidos", function (fila) {
             return [
@@ -344,6 +380,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+
+// ---------------- Tabla de mensajes de contacto ----------------
+// Cada fila se puede pulsar para leer el mensaje completo
     async function cargarMensajes() {
         const tabla = document.getElementById("tabla-mensajes");
 
@@ -398,6 +437,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+
+// ---------------- Ventana con el mensaje completo ----------------
+// Incluye un boton para responder por correo con el asunto ya escrito
     function abrirMensaje(mensaje) {
         let modal = document.getElementById("modal-mensaje");
 
@@ -476,6 +518,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         modal.classList.add("activo");
     }
 
+
+// ---------------- Funcion generica para llenar tablas ----------------
+// Recibe la tabla, la ruta de la API y como convertir cada registro en fila
     async function llenar(idTabla, ruta, campo, transformar) {
         const tabla = document.getElementById(idTabla);
 
@@ -519,6 +564,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+
+// ---------------- Mensaje dentro de una tabla vacia ----------------
     function mensajeEnTabla(cuerpo, columnas, texto) {
         if (!cuerpo) {
             return;
@@ -537,6 +584,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         cuerpo.appendChild(fila);
     }
 
+
+// ---------------- Bloquear el panel a quien no es admin ----------------
     function bloquearPanel(mensaje) {
         ["tabla-rpt1", "tabla-rpt2", "tabla-productos",
          "tabla-inventario", "tabla-pedidos", "tabla-mensajes"].forEach(function (id) {
@@ -549,6 +598,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+
+// ---------------- Ayudantes de formulario y fechas ----------------
     function valorCampo(id) {
         const elemento = document.getElementById(id);
         return elemento ? elemento.value.trim() : "";

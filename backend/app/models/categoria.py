@@ -1,8 +1,15 @@
+# ============================================================
+# CATEGORIA
+# Hoodies, Pantalones y Accesorios. Agrupa productos (agregacion:
+# el producto sigue existiendo aunque se borre la categoria).
+# ============================================================
 import re
 
 from app.utils.excepciones import ErrorValidacion
 
 
+
+# ---------------- La clase ----------------
 class Categoria:
 
     REGEX_SLUG = re.compile(r"^[a-z0-9-]+$")
@@ -67,6 +74,8 @@ class Categoria:
     def total_activos(self):
         return len(self.listar_activos())
 
+
+# ---------------- Agregar y quitar productos ----------------
     def agregar_producto(self, producto):
         if producto in self._productos:
             return False
@@ -78,6 +87,8 @@ class Categoria:
         self._productos = [p for p in self._productos if p.codigo != codigo]
         return len(self._productos) < antes
 
+
+# ---------------- Filtros sobre los productos ----------------
     def listar_activos(self):
         return [p for p in self._productos if p.activo]
 
@@ -90,6 +101,8 @@ class Categoria:
     def ordenar_por_precio(self, descendente=False):
         return sorted(self.listar_activos(), reverse=descendente)
 
+
+# ---------------- Rango de precios de la categoria ----------------
     def precio_minimo(self):
         activos = self.listar_activos()
         return min(p.calcular_precio_final() for p in activos) if activos else None

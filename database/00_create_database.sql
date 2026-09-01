@@ -1,3 +1,8 @@
+-- ============================================================
+-- 00 · CREAR LA BASE DE DATOS
+-- Crea la base red_goat_eyes con codificacion UTF-8.
+-- Se ejecuta conectado a postgres, no a la base nueva.
+-- ============================================================
 CREATE DATABASE red_goat_eyes
     WITH
     ENCODING = 'UTF8'

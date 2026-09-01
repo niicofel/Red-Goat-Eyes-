@@ -1,3 +1,10 @@
+-- ============================================================
+-- 01 · ESTRUCTURA
+-- Crea las 21 tablas con sus claves, restricciones e indices.
+-- El orden importa: primero las tablas de catalogo y luego las
+-- que dependen de ellas por clave foranea.
+-- ============================================================
+-- ---------------- Provincias y ciudades del Ecuador ----------------
 CREATE TABLE provincia (
     id_provincia  INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre        VARCHAR(60) NOT NULL,
@@ -29,6 +36,8 @@ COMMENT ON TABLE ciudad IS 'Ciudades. Sustituye al campo de texto libre del form
 CREATE INDEX idx_ciudad_provincia ON ciudad (id_provincia);
 
 
+
+-- ---------------- Categorias del catalogo ----------------
 CREATE TABLE categoria (
     id_categoria    INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre          VARCHAR(50)  NOT NULL,
@@ -47,6 +56,9 @@ CREATE TABLE categoria (
 COMMENT ON TABLE categoria IS 'Hoodies, Pantalones y Accesorios';
 
 
+
+-- ---------------- Tallas disponibles ----------------
+-- El campo orden sirve para mostrarlas de menor a mayor
 CREATE TABLE talla (
     id_talla     INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     codigo       VARCHAR(5)  NOT NULL,
@@ -61,6 +73,9 @@ CREATE TABLE talla (
 COMMENT ON TABLE talla IS 'Catalogo de tallas. En esta version se siembra solo la talla U (unica)';
 
 
+
+-- ---------------- Productos ----------------
+-- El stock NO esta aqui: esta en producto_talla
 CREATE TABLE producto (
     id_producto       INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_categoria      INT NOT NULL,
@@ -102,6 +117,9 @@ CREATE INDEX idx_producto_categoria ON producto (id_categoria);
 CREATE INDEX idx_producto_activo    ON producto (activo) WHERE activo = TRUE;
 
 
+
+-- ---------------- Inventario por talla ----------------
+-- Tabla puente. Cada fila es un producto en una talla, con su stock
 CREATE TABLE producto_talla (
     id_producto_talla  INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_producto        INT NOT NULL,
@@ -129,6 +147,8 @@ CREATE INDEX idx_producto_talla_producto ON producto_talla (id_producto);
 CREATE INDEX idx_producto_talla_talla    ON producto_talla (id_talla);
 
 
+
+-- ---------------- Imagenes de los productos ----------------
 CREATE TABLE imagen_producto (
     id_imagen    INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_producto  INT NOT NULL,
@@ -151,6 +171,9 @@ COMMENT ON TABLE imagen_producto IS 'Galeria 1:N por producto con texto alternat
 CREATE INDEX idx_imagen_producto ON imagen_producto (id_producto);
 
 
+
+-- ---------------- Usuarios y credenciales ----------------
+-- Guarda el hash de la contrasena, nunca la contrasena real
 CREATE TABLE usuario (
     id_usuario      INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     email           VARCHAR(120) NOT NULL,
@@ -180,6 +203,9 @@ COMMENT ON TABLE usuario IS 'Credenciales y rol. Tabla base de la herencia clien
 CREATE INDEX idx_usuario_rol ON usuario (rol);
 
 
+
+-- ---------------- Datos de cliente ----------------
+-- Su clave primaria es tambien clave foranea hacia usuario
 CREATE TABLE cliente (
     id_cliente        INT PRIMARY KEY,
     nombres           VARCHAR(60) NOT NULL,
@@ -218,6 +244,8 @@ COMMENT ON TABLE cliente IS 'Especializacion 1:1 de usuario. PK = FK a usuario';
 CREATE INDEX idx_cliente_ciudad ON cliente (id_ciudad);
 
 
+
+-- ---------------- Datos de administrador ----------------
 CREATE TABLE administrador (
     id_administrador  INT PRIMARY KEY,
     nombres           VARCHAR(60) NOT NULL,
@@ -237,6 +265,8 @@ CREATE TABLE administrador (
 COMMENT ON TABLE administrador IS 'Especializacion 1:1 de usuario. PK = FK a usuario';
 
 
+
+-- ---------------- Direcciones de entrega ----------------
 CREATE TABLE direccion_envio (
     id_direccion      INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_cliente        INT NOT NULL,
@@ -269,6 +299,8 @@ CREATE INDEX idx_direccion_cliente ON direccion_envio (id_cliente);
 CREATE INDEX idx_direccion_ciudad  ON direccion_envio (id_ciudad);
 
 
+
+-- ---------------- Estados y metodos de pago ----------------
 CREATE TABLE estado_pedido (
     id_estado    INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre       VARCHAR(20) NOT NULL,
@@ -295,6 +327,9 @@ CREATE TABLE metodo_pago (
 COMMENT ON TABLE metodo_pago IS 'Los 4 metodos que ofrece pago.html';
 
 
+
+-- ---------------- Pedidos ----------------
+-- Guarda subtotal, IVA y total a proposito, para conservar el historial
 CREATE TABLE pedido (
     id_pedido       INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     codigo_pedido   VARCHAR(20) NOT NULL,
@@ -345,6 +380,9 @@ CREATE INDEX idx_pedido_estado  ON pedido (id_estado);
 CREATE INDEX idx_pedido_fecha   ON pedido (fecha_pedido);
 
 
+
+-- ---------------- Lineas de cada pedido ----------------
+-- El precio se congela aqui, para que el pedido no cambie despues
 CREATE TABLE detalle_pedido (
     id_detalle         INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_pedido          INT NOT NULL,
@@ -380,6 +418,8 @@ CREATE INDEX idx_detalle_pedido   ON detalle_pedido (id_pedido);
 CREATE INDEX idx_detalle_producto ON detalle_pedido (id_producto_talla);
 
 
+
+-- ---------------- Carrito guardado ----------------
 CREATE TABLE carrito (
     id_carrito           INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_cliente           INT NOT NULL,
@@ -420,6 +460,8 @@ COMMENT ON TABLE carrito_item IS 'Tabla puente N:M entre carrito y producto_tall
 CREATE INDEX idx_carrito_item_carrito ON carrito_item (id_carrito);
 
 
+
+-- ---------------- Formulario de contacto ----------------
 CREATE TABLE asunto_contacto (
     id_asunto  INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre     VARCHAR(30) NOT NULL,
@@ -486,6 +528,8 @@ CREATE INDEX idx_mensaje_asunto ON mensaje_contacto (id_asunto);
 CREATE INDEX idx_mensaje_leido  ON mensaje_contacto (leido) WHERE leido = FALSE;
 
 
+
+-- ---------------- Registro de cambios ----------------
 CREATE TABLE auditoria (
     id_auditoria      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     tabla_afectada    VARCHAR(50) NOT NULL,
@@ -512,6 +556,9 @@ COMMENT ON TABLE auditoria IS 'Bitacora de cambios criticos. Guarda el estado an
 CREATE INDEX idx_auditoria_tabla ON auditoria (tabla_afectada, fecha);
 
 
+
+-- ---------------- Cola de correos por enviar ----------------
+-- El trigger deja aqui los recibos y Flask los envia despues
 CREATE TABLE envio_correo (
     id_envio       INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_pedido      INT NOT NULL,

@@ -1,3 +1,11 @@
+// ============================================================
+// CARRITO-CONTADOR.JS
+// Se carga en las 13 paginas. Aqui vive todo lo compartido:
+// hablar con la API, la sesion, el carrito y las notificaciones.
+// Los demas archivos usan las funciones que estan aqui.
+// ============================================================
+// ---------------- Constantes del sistema ----------------
+// RGE_API es la direccion base de la API. Todo cuelga de /api
 const RGE_CLAVE_CARRITO = "rge_carrito";
 const RGE_CLAVE_PEDIDO  = "rge_ultimo_pedido";
 const RGE_API = "/api";
@@ -6,6 +14,9 @@ const RGE_IVA = 0.15;
 let rgeSesionActual = null;
 let rgeCatalogoCache = null;
 
+
+// ---------------- Hablar con la API ----------------
+// Envuelve fetch: arma el JSON, y si algo falla lanza un error con codigo y mensaje
 async function rgeApi(ruta, opciones) {
     const config = Object.assign({
         credentials: "same-origin",
@@ -51,6 +62,9 @@ async function rgeApi(ruta, opciones) {
     return datos;
 }
 
+
+// ---------------- Leer y guardar el carrito ----------------
+// El carrito vive en localStorage, o sea en el navegador del usuario
 function rgeLeerCarrito() {
     try {
         const datos = localStorage.getItem(RGE_CLAVE_CARRITO);
@@ -76,6 +90,8 @@ function rgeVaciarCarrito() {
     rgeActualizarContador();
 }
 
+
+// ---------------- Contador del icono del carrito ----------------
 function rgeContarUnidades() {
     return rgeLeerCarrito().reduce(function (suma, item) {
         return suma + item.cantidad;
@@ -94,6 +110,9 @@ function rgeActualizarContador() {
     contador.style.display = total > 0 ? "flex" : "none";
 }
 
+
+// ---------------- Catalogo en memoria ----------------
+// Se pide una sola vez por pagina y se guarda para no repetir la peticion
 async function rgeCatalogo() {
     if (rgeCatalogoCache) {
         return rgeCatalogoCache;
@@ -112,6 +131,9 @@ async function rgeBuscarPorCodigo(codigo) {
     }) || null;
 }
 
+
+// ---------------- Actualizar precios del carrito ----------------
+// Refresca nombre y precio desde la API, por si cambiaron
 async function rgeSincronizarCarrito() {
     const carrito = rgeLeerCarrito();
 
@@ -152,6 +174,9 @@ async function rgeSincronizarCarrito() {
     return vigentes;
 }
 
+
+// ---------------- Sesion del usuario ----------------
+// Pregunta al servidor quien esta conectado y marca el body con con-sesion o sin-sesion
 async function rgeCargarSesion() {
     try {
         const datos = await rgeApi("/auth/sesion");
@@ -187,6 +212,9 @@ async function rgeCerrarSesion() {
     rgeAplicarEstadoSesion();
 }
 
+
+// ---------------- Mostrar u ocultar segun quien seas ----------------
+// Pone las clases en el body; el CSS se encarga del resto
 function rgeAplicarEstadoSesion() {
     const sesion = rgeSesionActual;
     const cuerpo = document.body;
@@ -219,11 +247,16 @@ function rgeAplicarEstadoSesion() {
 }
 
 
+
+// ---------------- Calcular la ruta correcta ----------------
+// Desde la raiz hace falta pages/, desde dentro de pages/ no
 function rgeRutaPaginas() {
     return window.location.pathname.indexOf("/pages/") !== -1 ? "" : "pages/";
 }
 
 
+
+// ---------------- Mostrar el rol en el menu ----------------
 function rgeMostrarRol() {
     const menu = document.getElementById("usuario-dropdown");
 
@@ -258,6 +291,9 @@ function rgeMostrarRol() {
 }
 
 
+
+// ---------------- Enlace al panel solo para admin ----------------
+// Se agrega desde JavaScript para no repetirlo en los 13 HTML
 function rgeEnlaceAdministracion() {
     const menu = document.getElementById("usuario-dropdown");
 
@@ -301,6 +337,9 @@ function rgeEnlaceAdministracion() {
     }
 }
 
+
+// ---------------- Menu desplegable del usuario ----------------
+// Se cierra al hacer clic fuera o con la tecla Escape
 function rgeIniciarMenuUsuario() {
     const boton = document.getElementById("btn-usuario");
     const menu  = document.getElementById("usuario-dropdown");
@@ -344,6 +383,9 @@ function rgeIniciarMenuUsuario() {
     }
 }
 
+
+// ---------------- Formato de precios y totales ----------------
+// rgeCalcularTotales es un respaldo; lo normal es pedirlos al servidor
 function rgeFormatearPrecio(valor) {
     return "$" + Number(valor).toFixed(2);
 }
@@ -373,12 +415,17 @@ async function rgeCalcularTotalesServidor(carrito) {
     return await rgeApi("/pedidos/calcular", { cuerpo: { items: items } });
 }
 
+
+// ---------------- Validacion de correo ----------------
 const RGE_REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function rgeEmailValido(email) {
     return RGE_REGEX_EMAIL.test(String(email).trim());
 }
 
+
+// ---------------- Notificacion flotante ----------------
+// El mensajito que aparece arriba y se va solo a los 2.6 segundos
 function rgeNotificar(mensaje, tipo) {
     const anterior = document.querySelector(".notificacion");
 
@@ -403,6 +450,9 @@ function rgeNotificar(mensaje, tipo) {
     }, 2600);
 }
 
+
+// ---------------- Arranque ----------------
+// Se ejecuta cuando el HTML termino de cargar
 document.addEventListener("DOMContentLoaded", function () {
     rgeActualizarContador();
     rgeIniciarMenuUsuario();

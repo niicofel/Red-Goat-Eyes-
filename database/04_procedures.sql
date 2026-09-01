@@ -1,3 +1,8 @@
+-- ============================================================
+-- 04 · PROCEDIMIENTOS ALMACENADOS
+-- Operaciones que tocan varias tablas y deben hacerse completas
+-- o no hacerse. Si algo falla a la mitad, se deshace todo.
+-- ============================================================
 CREATE SEQUENCE IF NOT EXISTS seq_codigo_pedido
     START WITH 1
     INCREMENT BY 1
@@ -15,6 +20,9 @@ SELECT setval(
 
 
 
+
+-- ---------------- Registrar un pedido ----------------
+-- Crea el pedido y todas sus lineas de una sola vez
 CREATE OR REPLACE PROCEDURE sp_registrar_pedido(
     IN    p_id_cliente      INT,
     IN    p_id_direccion    INT,
@@ -121,6 +129,9 @@ COMMENT ON PROCEDURE sp_registrar_pedido IS 'Registra un pedido completo de form
 
 
 
+
+-- ---------------- Registrar un cliente ----------------
+-- Crea usuario y cliente juntos: si falla uno, no se crea ninguno
 CREATE OR REPLACE PROCEDURE sp_registrar_cliente(
     IN    p_email             VARCHAR(120),
     IN    p_password_hash     VARCHAR(255),
@@ -173,6 +184,9 @@ COMMENT ON PROCEDURE sp_registrar_cliente IS 'Crea usuario, cliente y carrito en
 
 
 
+
+-- ---------------- Cambiar el estado de un pedido ----------------
+-- Valida que la transicion sea permitida antes de cambiarlo
 CREATE OR REPLACE PROCEDURE sp_cambiar_estado_pedido(
     IN p_codigo_pedido    VARCHAR(20),
     IN p_nuevo_estado     VARCHAR(20),
@@ -258,6 +272,9 @@ COMMENT ON PROCEDURE sp_cambiar_estado_pedido IS 'Cambia el estado de un pedido 
 
 
 
+
+-- ---------------- Reponer stock ----------------
+-- Vuelve a comprobar el nivel del administrador dentro de PostgreSQL
 CREATE OR REPLACE PROCEDURE sp_reponer_stock(
     IN p_codigo_producto  VARCHAR(20),
     IN p_codigo_talla     VARCHAR(5),

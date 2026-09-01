@@ -1,8 +1,18 @@
+# ============================================================
+# RUN.PY
+# Arranca el servidor. Es el archivo que se ejecuta con
+# python run.py para levantar la pagina.
+# ============================================================
 from app import create_app
 from app.config import Config
 
+
+# ---------------- Crear la aplicacion ----------------
 app = create_app()
 
+
+# ---------------- Arrancar el servidor ----------------
+# Avisa si falta algo en el .env y muestra las direcciones utiles
 if __name__ == "__main__":
     faltantes = Config.validar()
     if faltantes:

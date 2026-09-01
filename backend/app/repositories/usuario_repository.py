@@ -1,3 +1,9 @@
+# ============================================================
+# USUARIO REPOSITORY
+# Consultas de usuarios, clientes y direcciones.
+# Solo puede leer la tabla usuario por columnas concretas; para
+# todo lo demas usa la vista v_usuario_seguro, que no expone el hash.
+# ============================================================
 from app.models.administrador import Administrador
 from app.models.cliente import Cliente
 from app.models.direccion import Direccion
@@ -12,6 +18,8 @@ SELECT_USUARIO = """
 """
 
 
+
+# ---------------- La clase ----------------
 class UsuarioRepository(BaseRepository):
 
     @property
@@ -22,6 +30,8 @@ class UsuarioRepository(BaseRepository):
     def clave_primaria(self):
         return "id_usuario"
 
+
+# ---------------- Crear un Cliente o un Administrador segun el rol ----------------
     def a_objeto(self, fila):
         if fila is None:
             return None
@@ -36,6 +46,8 @@ class UsuarioRepository(BaseRepository):
             None, fila["ciudad"], None,
             fila["activo"])
 
+
+# ---------------- Buscar usuarios ----------------
     def obtener_por_id(self, id_usuario):
         fila = self._consultar_uno(SELECT_USUARIO + " WHERE id_usuario = %s",
                                    (id_usuario,))
@@ -46,16 +58,24 @@ class UsuarioRepository(BaseRepository):
                                    (email,))
         return self.a_objeto(fila)
 
+
+# ---------------- Datos para iniciar sesion ----------------
+# Es la unica consulta que lee el password_hash
     def obtener_credenciales(self, email):
         return self._consultar_uno(
             "SELECT id_usuario, email, password_hash, rol, activo "
             "FROM usuario WHERE LOWER(email) = LOWER(%s)", (email,))
 
+
+# ---------------- Comprobar si un correo ya esta registrado ----------------
     def email_existe(self, email):
         return self._consultar_uno(
             "SELECT 1 AS existe FROM usuario WHERE LOWER(email) = LOWER(%s)",
             (email,)) is not None
 
+
+# ---------------- Registrar un cliente nuevo ----------------
+# Llama a sp_registrar_cliente, que crea usuario y cliente en una transaccion
     def registrar_cliente(self, email, password_hash, nombres, apellidos,
                           cedula, telefono, id_ciudad, fecha_nacimiento=None):
         if self.email_existe(email):
@@ -75,11 +95,15 @@ class UsuarioRepository(BaseRepository):
         id_cliente = salida.get("p_id_cliente") if salida else None
         return self.obtener_por_id(id_cliente) if id_cliente else self.obtener_por_email(email)
 
+
+# ---------------- Guardar la fecha del ultimo acceso ----------------
     def registrar_acceso(self, id_usuario):
         return self._ejecutar(
             "UPDATE usuario SET ultimo_acceso = CURRENT_TIMESTAMP WHERE id_usuario = %s",
             (id_usuario,)) > 0
 
+
+# ---------------- Direcciones del cliente ----------------
     def obtener_direcciones(self, id_cliente):
         filas = self._consultar_todos("""
             SELECT d.id_direccion, d.id_cliente, d.calle_principal,
@@ -95,6 +119,8 @@ class UsuarioRepository(BaseRepository):
                           f["numeracion"], f["referencia"],
                           f["codigo_postal"], f["es_principal"]) for f in filas]
 
+
+# ---------------- Crear una direccion ----------------
     def crear_direccion(self, id_cliente, id_ciudad, calle_principal,
                         calle_secundaria=None, numeracion=None,
                         referencia=None, codigo_postal=None, es_principal=False):
@@ -108,6 +134,8 @@ class UsuarioRepository(BaseRepository):
               numeracion, referencia, codigo_postal, es_principal), devolver=True)
         return fila["id_direccion"] if fila else None
 
+
+# ---------------- Las 30 ciudades ----------------
     def obtener_ciudades(self):
         return self._consultar_todos("""
             SELECT ci.id_ciudad, ci.nombre, p.nombre AS provincia

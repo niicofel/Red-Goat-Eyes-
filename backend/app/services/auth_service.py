@@ -1,3 +1,9 @@
+# ============================================================
+# AUTH SERVICE
+# Iniciar sesion y registrar usuarios.
+# Las contrasenas se guardan con bcrypt, que es de un solo
+# sentido: se puede comprobar pero no se puede recuperar.
+# ============================================================
 import bcrypt
 
 from app.config import Config
@@ -8,15 +14,22 @@ from app.utils.validadores import (validar_cedula, validar_email, validar_entero
                                    validar_password, validar_telefono)
 
 
+
+# ---------------- La clase ----------------
 class AuthService:
 
     def __init__(self, repositorio=None):
         self._repo = repositorio or UsuarioRepository()
 
+
+# ---------------- Convertir la contrasena en hash ----------------
+# 12 rondas de bcrypt. Cada vez da un resultado distinto por la sal aleatoria
     def hashear(self, password):
         semilla = bcrypt.gensalt(rounds=Config.BCRYPT_ROUNDS)
         return bcrypt.hashpw(password.encode("utf-8"), semilla).decode("utf-8")
 
+
+# ---------------- Comprobar si la contrasena coincide ----------------
     def verificar(self, password, hash_guardado):
         try:
             return bcrypt.checkpw(password.encode("utf-8"),
@@ -24,6 +37,9 @@ class AuthService:
         except (ValueError, TypeError):
             return False
 
+
+# ---------------- Iniciar sesion ----------------
+# Si el correo o la clave estan mal, el mensaje es el mismo para no dar pistas
     def iniciar_sesion(self, email, password):
         correo = validar_email(email)
         clave = validar_password(password, minimo=1)
@@ -39,6 +55,9 @@ class AuthService:
         self._repo.registrar_acceso(credenciales["id_usuario"])
         return self._repo.obtener_por_id(credenciales["id_usuario"])
 
+
+# ---------------- Registrar un cliente nuevo ----------------
+# Valida todo antes de tocar la base de datos
     def registrar(self, datos):
         correo = validar_email(datos.get("email"))
         clave = validar_password(datos.get("password"))
@@ -56,6 +75,8 @@ class AuthService:
         return self._repo.registrar_cliente(correo, hash_clave, nombres, apellidos,
                                             cedula, telefono, id_ciudad, nacimiento)
 
+
+# ---------------- Catalogos y direcciones ----------------
     def obtener_ciudades(self):
         return self._repo.obtener_ciudades()
 
