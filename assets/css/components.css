@@ -1340,3 +1340,15 @@
     opacity: 0.3;
     text-decoration: line-through;
 }
+
+.modal-aviso-stock {
+    display: block;
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: var(--gris-texto);
+    letter-spacing: 0.02em;
+}
+
+body.modal-abierto {
+    overflow: hidden;
+}

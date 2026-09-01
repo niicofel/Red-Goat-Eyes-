@@ -4,7 +4,7 @@ from app.config import Config
 from app.repositories.pedido_repository import PedidoRepository
 from app.repositories.producto_repository import ProductoRepository
 from app.repositories.usuario_repository import UsuarioRepository
-from app.utils.excepciones import CarritoVacio, ErrorValidacion, StockInsuficiente
+from app.utils.excepciones import (CarritoVacio, ErrorValidacion, PermisoDenegado, StockInsuficiente)
 from app.utils.validadores import validar_cantidad, validar_email, validar_entero
 
 
@@ -59,6 +59,13 @@ class PedidoService:
         items = datos.get("items") or []
         if not items:
             raise CarritoVacio()
+
+        comprador = self._usuarios.obtener_por_id(id_cliente)
+
+        if comprador is None or comprador.obtener_rol() != "cliente":
+            raise PermisoDenegado(
+                "realizar compras con una cuenta administrativa. "
+                "Inicie sesion con una cuenta de cliente")
 
         validar_email(datos.get("email"))
 

@@ -274,7 +274,9 @@ COMMENT ON VIEW v_usuario_seguro IS
     'Datos de usuario SIN password_hash. Es la unica via de lectura para la aplicacion';
 
 
-CREATE OR REPLACE VIEW v_catalogo_publico AS
+DROP VIEW IF EXISTS v_catalogo_publico;
+
+CREATE VIEW v_catalogo_publico AS
 SELECT
     p.id_producto,
     p.codigo,
@@ -293,10 +295,12 @@ SELECT
     p.material,
     p.genero,
     p.destacado,
-    t.codigo                                  AS talla,
-    pt.id_producto_talla,
-    pt.stock,
-    (pt.stock > 0)                            AS disponible,
+    SUM(pt.stock)::INT                        AS stock,
+    (SUM(pt.stock) > 0)                       AS disponible,
+    COUNT(*) FILTER (WHERE pt.stock > 0)::INT AS tallas_disponibles,
+    STRING_AGG(t.codigo, ',' ORDER BY t.orden)
+        FILTER (WHERE pt.stock > 0)           AS tallas,
+    MIN(pt.id_producto_talla)::INT            AS id_producto_talla,
     img.alt_text
 FROM        producto        p
 JOIN        categoria       c   ON c.id_categoria = p.id_categoria
@@ -305,10 +309,18 @@ JOIN        talla           t   ON t.id_talla     = pt.id_talla
 LEFT JOIN   imagen_producto img ON img.id_producto = p.id_producto AND img.orden = 1
 WHERE       p.activo = TRUE
   AND       c.activa = TRUE
+GROUP BY    p.id_producto, p.codigo, p.nombre, p.descripcion, c.nombre, c.slug,
+            p.precio, p.precio_oferta, p.imagen_principal, p.material,
+            p.genero, p.destacado, img.alt_text
 ORDER BY    c.nombre, p.codigo;
 
 COMMENT ON VIEW v_catalogo_publico IS
-    'Catalogo que consume el frontend. Centraliza la regla de que producto es visible';
+    'Catalogo que consume el frontend. Una fila por producto, con el stock sumado de todas sus tallas';
+
+
+GRANT SELECT ON v_catalogo_publico TO rge_app_read;
+GRANT SELECT ON v_catalogo_publico TO rge_app_write;
+GRANT SELECT ON v_catalogo_publico TO rge_admin;
 
 
 SELECT table_name AS vista

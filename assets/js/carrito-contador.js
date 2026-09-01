@@ -138,18 +138,14 @@ async function rgeSincronizarCarrito() {
             return;
         }
 
-        item.id_producto_talla = real.id_producto_talla;
+
         item.nombre = real.nombre;
         item.precio = real.precio_final;
-        item.stock  = real.stock;
-
-        if (item.cantidad > real.stock) {
-            item.cantidad = real.stock;
-        }
 
         if (item.cantidad > 0) {
             vigentes.push(item);
         }
+
     });
 
     rgeGuardarCarrito(vigentes);
@@ -214,6 +210,94 @@ function rgeAplicarEstadoSesion() {
     if (boton) {
         boton.title = sesion ? "Sesion de " + sesion.nombre : "Iniciar sesion";
         boton.classList.toggle("sesion-activa", Boolean(sesion));
+    }
+
+    cuerpo.classList.toggle("es-admin", rgeEsAdministrador());
+
+    rgeMostrarRol();
+    rgeEnlaceAdministracion();
+}
+
+
+function rgeRutaPaginas() {
+    return window.location.pathname.indexOf("/pages/") !== -1 ? "" : "pages/";
+}
+
+
+function rgeMostrarRol() {
+    const menu = document.getElementById("usuario-dropdown");
+
+    if (!menu) {
+        return;
+    }
+
+    let etiqueta = menu.querySelector(".usuario-rol");
+
+    if (!rgeSesionActual) {
+        if (etiqueta) {
+            etiqueta.remove();
+        }
+        return;
+    }
+
+    if (!etiqueta) {
+        etiqueta = document.createElement("li");
+        etiqueta.className = "usuario-rol";
+
+        const saludo = document.getElementById("usuario-saludo");
+
+        if (saludo && saludo.parentNode) {
+            saludo.parentNode.insertBefore(etiqueta, saludo.nextSibling);
+        } else {
+            menu.insertBefore(etiqueta, menu.firstChild);
+        }
+    }
+
+    etiqueta.textContent = rgeEsAdministrador() ? "Administrador" : "Cliente";
+    etiqueta.classList.toggle("rol-admin", rgeEsAdministrador());
+}
+
+
+function rgeEnlaceAdministracion() {
+    const menu = document.getElementById("usuario-dropdown");
+
+    if (!menu) {
+        return;
+    }
+
+    const enlaceCarrito = menu.querySelector('a[href$="carrito.html"]');
+
+    if (enlaceCarrito && enlaceCarrito.parentNode) {
+        enlaceCarrito.parentNode.style.display = rgeEsAdministrador() ? "none" : "";
+    }
+
+    let item = menu.querySelector(".solo-admin");
+
+    if (!rgeEsAdministrador()) {
+        if (item) {
+            item.remove();
+        }
+        return;
+    }
+
+    if (item) {
+        return;
+    }
+
+    item = document.createElement("li");
+    item.className = "solo-admin";
+
+    const enlace = document.createElement("a");
+    enlace.href = rgeRutaPaginas() + "admin.html";
+    enlace.textContent = "Panel de administracion";
+    item.appendChild(enlace);
+
+    const salir = document.getElementById("btn-salir");
+
+    if (salir && salir.parentNode) {
+        menu.insertBefore(item, salir.parentNode);
+    } else {
+        menu.appendChild(item);
     }
 }
 
