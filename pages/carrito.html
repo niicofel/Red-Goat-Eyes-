@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+
+<!-- ============================================================
+     CARRITO.HTML
+     Carrito de compras
+     ============================================================ -->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -7,6 +12,9 @@
     <meta name="description" content=" Revisa los productos de tu carrito ">
     <meta name="keywords" content=" ropa urbana, unisex, ecuador - quito, streetwear ">
     <link rel="icon" type="image/png" href="../assets/img/icons/RedGoatEyesIcon.png">
+
+    <!-- ---------------- Hojas de estilo ---------------- -->
+    <!-- El orden importa: responsive va al final para poder sobrescribir -->
     <link rel="stylesheet" href="../assets/css/base.css">
     <link rel="stylesheet" href="../assets/css/layout.css">
     <link rel="stylesheet" href="../assets/css/components.css">
@@ -19,8 +27,13 @@
 </head>
 <body>
 
+
+    <!-- ---------------- Cabecera ---------------- -->
+    <!-- Se repite igual en las 13 paginas -->
     <header class="site-header">
 
+
+        <!-- ---------------- Barra superior de ubicacion ---------------- -->
         <div class="top-bar">
             <div class="location">
                 <i class="fa-solid fa-location-dot"></i>
@@ -28,6 +41,8 @@
             </div>
         </div>
 
+
+        <!-- ---------------- Barra de navegacion ---------------- -->
         <nav class="navbar">
             <div class="logo">
                 <a href="../index.html">
@@ -35,10 +50,15 @@
                 </a>
             </div>
 
+
+            <!-- ---------------- Boton hamburguesa ---------------- -->
+            <!-- Solo se ve en pantallas menores a 768px -->
             <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
                 <i class="fa-solid fa-bars"></i>
             </button>
 
+
+            <!-- ---------------- Enlaces del menu ---------------- -->
             <ul class="nav-links" id="nav-links">
                 <li><a href="../index.html"> Inicio </a></li>
 
@@ -55,6 +75,8 @@
                 <li><a href="contacto.html"> Contacto </a></li>
             </ul>
 
+
+            <!-- ---------------- Iconos de carrito y usuario ---------------- -->
             <div class="nav-icons">
                 <a href="carrito.html" class="icono-carrito" aria-label="Ver carrito">
                     <i class="fa-solid fa-cart-shopping"></i>
@@ -66,6 +88,9 @@
                         <i class="fa-regular fa-user"></i>
                     </button>
 
+
+                    <!-- ---------------- Menu desplegable del usuario ---------------- -->
+                    <!-- Las clases solo-invitado y solo-cliente las controla el JavaScript segun la sesion -->
                     <ul class="usuario-dropdown" id="usuario-dropdown">
                         <li class="usuario-saludo solo-cliente" id="usuario-saludo"></li>
                         <li class="solo-invitado"><a href="login.html"> Iniciar sesión </a></li>
@@ -83,19 +108,29 @@
 
     <main class="pagina-carrito">
 
+
+        <!-- ---------------- Pagina del carrito ---------------- -->
         <section class="carrito-lista-seccion">
             <h1> Mi carrito </h1>
 
+
+            <!-- ---------------- Mensaje de carrito vacio ---------------- -->
             <div id="carrito-vacio" class="mensaje-vacio">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <p> Tu carrito está vacío </p>
                 <a href="productos.html" class="card-button"> Ver productos </a>
             </div>
 
+
+            <!-- ---------------- Aqui el JavaScript dibuja las lineas ---------------- -->
+            <!-- Una linea por cada combinacion de producto y talla -->
             <div id="carrito-items" class="carrito-lista"></div>
 
         </section>
 
+
+        <!-- ---------------- Resumen con subtotal, IVA y total ---------------- -->
+        <!-- Los valores los calcula el servidor, no el navegador -->
         <aside class="carrito-resumen">
             <h2> Resumen del pedido </h2>
 
@@ -127,6 +162,8 @@
 
     </main>
 
+
+    <!-- ---------------- Pie de pagina ---------------- -->
     <footer class="footer">
 
         <div class="footer-top">
@@ -139,6 +176,9 @@
 
     </footer>
 
+
+    <!-- ---------------- Scripts ---------------- -->
+    <!-- carrito-contador va primero porque los demas usan sus funciones -->
     <script src="../assets/js/carrito-contador.js"></script>
     <script src="../assets/js/menu.js"></script>
     <script src="../assets/js/carrito.js"></script>

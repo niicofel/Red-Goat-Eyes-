@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+
+<!-- ============================================================
+     ADMIN.HTML
+     Panel de administracion
+     ============================================================ -->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -7,6 +12,9 @@
     <meta name="description" content=" Gestión de productos, pedidos y reportes ">
     <meta name="keywords" content=" ropa urbana, unisex, ecuador - quito, streetwear ">
     <link rel="icon" type="image/png" href="../assets/img/icons/RedGoatEyesIcon.png">
+
+    <!-- ---------------- Hojas de estilo ---------------- -->
+    <!-- El orden importa: responsive va al final para poder sobrescribir -->
     <link rel="stylesheet" href="../assets/css/base.css">
     <link rel="stylesheet" href="../assets/css/layout.css">
     <link rel="stylesheet" href="../assets/css/components.css">
@@ -19,8 +27,13 @@
 </head>
 <body>
 
+
+    <!-- ---------------- Cabecera ---------------- -->
+    <!-- Se repite igual en las 13 paginas -->
     <header class="site-header">
 
+
+        <!-- ---------------- Barra superior de ubicacion ---------------- -->
         <div class="top-bar">
             <div class="location">
                 <i class="fa-solid fa-location-dot"></i>
@@ -28,6 +41,8 @@
             </div>
         </div>
 
+
+        <!-- ---------------- Barra de navegacion ---------------- -->
         <nav class="navbar">
             <div class="logo">
                 <a href="../index.html">
@@ -35,10 +50,15 @@
                 </a>
             </div>
 
+
+            <!-- ---------------- Boton hamburguesa ---------------- -->
+            <!-- Solo se ve en pantallas menores a 768px -->
             <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
                 <i class="fa-solid fa-bars"></i>
             </button>
 
+
+            <!-- ---------------- Enlaces del menu ---------------- -->
             <ul class="nav-links" id="nav-links">
                 <li><a href="../index.html"> Inicio </a></li>
 
@@ -55,6 +75,8 @@
                 <li><a href="contacto.html"> Contacto </a></li>
             </ul>
 
+
+            <!-- ---------------- Iconos de carrito y usuario ---------------- -->
             <div class="nav-icons">
                 <a href="carrito.html" class="icono-carrito" aria-label="Ver carrito">
                     <i class="fa-solid fa-cart-shopping"></i>
@@ -66,6 +88,9 @@
                         <i class="fa-regular fa-user"></i>
                     </button>
 
+
+                    <!-- ---------------- Menu desplegable del usuario ---------------- -->
+                    <!-- Las clases solo-invitado y solo-cliente las controla el JavaScript segun la sesion -->
                     <ul class="usuario-dropdown" id="usuario-dropdown">
                         <li class="usuario-saludo solo-cliente" id="usuario-saludo"></li>
                         <li class="solo-invitado"><a href="login.html"> Iniciar sesión </a></li>
@@ -83,9 +108,14 @@
 
     <main>
 
+
+        <!-- ---------------- Panel de administracion ---------------- -->
+        <!-- Solo entra quien tenga rol de administrador -->
         <section class="admin-container">
             <h1> Panel de administración </h1>
 
+
+            <!-- ---------------- Pestanas del panel ---------------- -->
             <div class="admin-tabs">
                 <button type="button" class="tab-btn activa" data-tab="reportes"> Reportes </button>
                 <button type="button" class="tab-btn" data-tab="productos"> Productos </button>
@@ -95,8 +125,13 @@
             </div>
         </section>
 
+
+        <!-- ---------------- Pestana de reportes ---------------- -->
         <section id="tab-reportes" class="admin-panel">
 
+
+            <!-- ---------------- Tarjetas de indicadores ---------------- -->
+            <!-- Productos, clientes, pedidos, mensajes y alertas de stock -->
             <div id="resumen-admin" class="kpi-grid"></div>
 
 
@@ -118,6 +153,8 @@
                 </div>
 
                 <div class="tabla-scroll">
+
+                    <!-- ---------------- Reporte 1: ventas por categoria ---------------- -->
                     <table id="tabla-rpt1">
                         <thead>
                             <tr>
@@ -137,6 +174,8 @@
                 <h2> Reporte 2: Top clientes </h2>
 
                 <div class="tabla-scroll">
+
+                    <!-- ---------------- Reporte 2: ranking de clientes ---------------- -->
                     <table id="tabla-rpt2">
                         <thead>
                             <tr>
@@ -155,6 +194,8 @@
 
         </section>
 
+
+        <!-- ---------------- Pestana de productos ---------------- -->
         <section id="tab-productos" class="admin-panel oculto">
             <article class="reporte">
                 <h2> Gestión de productos </h2>
@@ -176,6 +217,9 @@
             </article>
         </section>
 
+
+        <!-- ---------------- Pestana de inventario ---------------- -->
+        <!-- Las 72 combinaciones de producto y talla -->
         <section id="tab-inventario" class="admin-panel oculto">
 
             <article class="admin-bloque">
@@ -185,6 +229,9 @@
                     con el administrador que la realizo.
                 </p>
 
+
+                <!-- ---------------- Formulario de reposicion ---------------- -->
+                <!-- Requiere administrador de nivel 2 o superior -->
                 <form id="form-reponer" class="form-reponer" novalidate>
                     <div class="form-group">
                         <label for="reponer-codigo"> Codigo del producto </label>
@@ -225,6 +272,9 @@
                 </div>
 
                 <div class="tabla-scroll">
+
+                    <!-- ---------------- Tabla de inventario ---------------- -->
+                    <!-- Amarillo cuando el stock esta critico, rojo cuando esta agotado -->
                     <table id="tabla-inventario">
                         <thead>
                             <tr>
@@ -246,6 +296,8 @@
         </section>
 
 
+
+        <!-- ---------------- Pestana de pedidos ---------------- -->
         <section id="tab-pedidos" class="admin-panel oculto">
             <article class="reporte">
                 <h2> Gestión de pedidos </h2>
@@ -266,6 +318,9 @@
             </article>
         </section>
 
+
+        <!-- ---------------- Pestana de mensajes ---------------- -->
+        <!-- Al pulsar una fila se abre el mensaje completo -->
         <section id="tab-mensajes" class="admin-panel oculto">
             <article class="reporte">
                 <h2> Mensajes de contacto </h2>
@@ -289,6 +344,8 @@
 
     </main>
 
+
+    <!-- ---------------- Pie de pagina ---------------- -->
     <footer class="footer">
 
         <div class="footer-top">
@@ -301,6 +358,9 @@
 
     </footer>
 
+
+    <!-- ---------------- Scripts ---------------- -->
+    <!-- carrito-contador va primero porque los demas usan sus funciones -->
     <script src="../assets/js/carrito-contador.js"></script>
     <script src="../assets/js/menu.js"></script>
     <script src="../assets/js/admin.js"></script>
