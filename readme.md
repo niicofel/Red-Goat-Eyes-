@@ -188,7 +188,7 @@ Accesible desde el menú de usuario, visible solo para cuentas administrativas.
 | [03 Diagrama de clases](docs/03_diagrama_clases.png) | Modelo UML del dominio |
 | [04 Decisiones UX/UI](docs/04_decisiones_ux_ui.md) | Justificación de cada decisión de diseño |
 | [05 Seguridad de datos](docs/05_seguridad_datos.md) | Control de acceso, integridad y respaldos |
-| [06 Manual de usuario](docs/06_manual_usuario.md) | Guía para cliente y administrador |
+| [06 Manual de usuario](docs/06_Manual%20de%20Usuario.pdf) | Guía para cliente y administrador (PDF) |
 | [07 Guion de sustentación](docs/07_guion_sustentacion.md) | Preparación de la defensa |
 
 ---
