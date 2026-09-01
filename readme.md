@@ -9,15 +9,17 @@ y **Desarrollo Web Frontend UX/UI**.
 
 ## Qué hace
 
-Una tienda funcional de punta a punta: el cliente navega el catálogo, arma su
-carrito, se registra, paga y recibe un recibo en PDF por correo. El
-administrador consulta reportes de ventas, inventario y mensajes.
+Una tienda funcional de punta a punta. El cliente navega el catálogo, abre la ficha
+de una prenda, elige su talla conociendo las unidades disponibles, paga y recibe un
+recibo en PDF por correo. El administrador consulta reportes, controla el inventario
+talla por talla, repone stock y atiende los mensajes recibidos.
 
 | | |
 |---|---|
 | Productos | 24 en 3 categorías |
+| Combinaciones producto-talla | 72 |
 | Páginas | 13 |
-| Endpoints de la API | 24 |
+| Endpoints de la API | 31 |
 | Tablas | 21 |
 | Clases del dominio | 15 |
 
@@ -53,7 +55,8 @@ Red-Goat-Eyes-/
 │   │   └── utils/          Validadores y excepciones
 │   ├── run.py              Arranca el servidor
 │   └── enviar_correos.py   Procesa la cola de recibos
-├── database/               10 scripts SQL numerados
+├── database/               11 scripts SQL numerados
+│   ├── setup.bat           Instala la base completa
 │   ├── backup/             Scripts y estrategia de respaldo
 │   └── diagramas/          Modelo E-R y relacional
 └── docs/                   Documentación del proyecto
@@ -73,24 +76,31 @@ venv\Scripts\activate
 python -m pip install -r backend/requirements.txt
 ```
 
-**2. Crear la base de datos**
+**2. Configurar las credenciales de la base**
 
-En pgAdmin, como `postgres`, ejecutar en orden los archivos de `database/`:
+Copiar `database/07_credenciales.sql.example` como `database/07_credenciales.sql`
+y escribir dentro las contraseñas elegidas para los roles.
+
+**3. Crear la base de datos**
 
 ```
-00_create_database.sql   →   01_schema.sql   →   02_seed.sql
-03_functions_triggers.sql →  04_procedures.sql →  05_views_reportes.sql
-06_roles_permisos.sql    →   07_credenciales.sql →  08_security_definer.sql
+cd database
+setup.bat
 ```
 
-> `07_credenciales.sql` no está en el repositorio. Copiar
-> `07_credenciales.sql.example`, renombrarlo y poner las contraseñas.
+El script ejecuta los once archivos SQL en orden y pide la contraseña de `postgres`.
+Al terminar debe cumplirse:
 
-**3. Configurar el entorno**
+```sql
+SELECT COUNT(*) FROM v_catalogo_publico;   -- 24
+SELECT COUNT(*) FROM producto_talla;       -- 72
+```
+
+**4. Configurar el entorno de la aplicación**
 
 Copiar `backend/.env.example` como `backend/.env` y completar las variables.
 
-**4. Ejecutar**
+**5. Ejecutar**
 
 ```
 cd backend
@@ -114,20 +124,29 @@ PostgreSQL    →  Persiste y garantiza la integridad
 
 ### Decisiones destacadas
 
-**Las reglas viven en las tres capas.** Una validación del formulario está
-replicada en Python y como restricción `CHECK` en PostgreSQL. Si alguien evita
-el navegador, la base rechaza el dato igual.
+**El inventario se controla por talla.** La tabla `producto_talla` guarda el stock
+de cada combinación de producto y talla. La vista `v_catalogo_publico` agrupa esas
+filas para que el catálogo devuelva 24 productos con su stock sumado y la lista de
+tallas disponibles, en lugar de 72 entradas repetidas.
 
-**La base encola, la aplicación envía.** PostgreSQL no tiene cliente SMTP. El
-trigger `trg_encolar_correo` registra el envío en la tabla `envio_correo`, y
-Flask consume esa cola. La base es la fuente de la verdad; la aplicación sale
-a la red.
+**El precio se calcula en un solo lugar.** El método `calcular_precio_final()` de
+cada subclase de `Producto` aplica los recargos y descuentos. El catálogo, la ficha
+y el cobro usan ese mismo método, de modo que el importe mostrado y el cobrado
+siempre coinciden.
+
+**Las reglas viven en las tres capas.** Una validación del formulario está replicada
+en Python y como restricción `CHECK` en PostgreSQL. Si alguien evita el navegador,
+la base rechaza el dato igual.
+
+**La base encola, la aplicación envía.** PostgreSQL no tiene cliente SMTP. El trigger
+`trg_encolar_correo` registra el envío en la tabla `envio_correo`, y Flask consume
+esa cola. La base es la fuente de la verdad; la aplicación sale a la red.
 
 **La venta nunca depende del correo.** El envío corre en segundo plano. Si Gmail
 falla, el pedido se registra igual y el recibo queda pendiente de reintento.
 
-**El dinero nunca es punto flotante.** `Decimal` en Python, `NUMERIC` en
-PostgreSQL. JavaScript, Flask y la base producen el mismo total.
+**El dinero nunca es punto flotante.** `Decimal` en Python, `NUMERIC` en PostgreSQL.
+JavaScript, Flask y la base producen el mismo total.
 
 ---
 
@@ -135,12 +154,28 @@ PostgreSQL. JavaScript, Flask y la base producen el mismo total.
 
 - La aplicación **nunca** se conecta como superusuario
 - 7 roles con permisos a nivel de columna
-- Contraseñas con bcrypt de 12 rondas
+- Contraseñas con bcrypt de 12 rondas, irreversibles por diseño
 - Credenciales fuera del repositorio (`.gitignore`)
 - Consultas parametrizadas, sin concatenación de SQL
+- El DOM se construye con `textContent`, nunca con `innerHTML`
 - Autorización verificada en tres capas independientes
+- Un administrador no puede realizar compras; el sistema responde 403
 
 Detalle completo en [`docs/05_seguridad_datos.md`](docs/05_seguridad_datos.md).
+
+---
+
+## Panel de administración
+
+Accesible desde el menú de usuario, visible solo para cuentas administrativas.
+
+| Pestaña | Contenido |
+|---------|-----------|
+| Reportes | Indicadores generales, ventas por categoría y ranking de clientes |
+| Productos | Los 24 productos con precio y stock total |
+| Inventario | Las 72 combinaciones producto-talla, con reposición auditada |
+| Pedidos | Todos los pedidos del sistema |
+| Mensajes | Buzón de contacto con lectura completa y respuesta por correo |
 
 ---
 
@@ -166,5 +201,5 @@ Detalle completo en [`docs/05_seguridad_datos.md`](docs/05_seguridad_datos.md).
 | Elian Emanuel Valenzuela Álvarez | [@elian.valenzuela.16](https://www.instagram.com/elian.valenzuela.16/) |
 | Rafael Chiriboga | [@rafachiriboga](https://www.instagram.com/rafachiriboga/) |
 
-PUCE TEC · Unidad Académica de Formación Técnica y Tecnológica
+PUCE TEC · Unidad Académica de Formación Técnica y Tecnológica  
 Quito, Ecuador · Agosto 2026

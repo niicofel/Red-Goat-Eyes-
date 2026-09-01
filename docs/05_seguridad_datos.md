@@ -2,7 +2,7 @@
 
 **Proyecto:** Red Goat Eyes  
 **Asignatura:** Base de Datos I  
-**Versión:** 1.0 · Agosto 2026
+**Versión:** 2.0 · Agosto 2026
 
 ---
 
@@ -35,7 +35,7 @@ Se definieron 7 roles divididos en dos grupos.
 | `rge_panel` | `rge_admin` | Panel y reportes |
 | `rge_respaldo` | `rge_backup` | Respaldos |
 
-Separar los permisos de las cuentas de conexión permite administrar el acceso de una manera más ordenada.
+Separar los permisos de las cuentas de conexión permite administrar el acceso de una manera más ordenada. Agregar una cuarta cuenta de conexión no exige reescribir ningún `GRANT`: basta con concederle el rol de grupo correspondiente.
 
 ### 2.2 Acceso limitado a columnas
 
@@ -45,9 +45,19 @@ Los datos de usuario destinados a consultas generales se obtienen mediante `v_us
 
 ### 2.3 Comprobación de los permisos
 
-Durante el desarrollo se verificaron los permisos utilizando los diferentes roles. Por ejemplo, `rge_flask` puede insertar mensajes de contacto, pero no leer la tabla completa de mensajes ni consultar los reportes administrativos. Para estas operaciones se utiliza `rge_panel`.
+Durante el desarrollo se verificaron los permisos utilizando los diferentes roles, con resultados que condicionaron el diseño del sistema.
 
-Esta separación hizo necesario manejar conexiones diferentes para la aplicación pública y para el panel administrativo.
+| Operación | `rge_flask` | `rge_panel` |
+|-----------|-------------|-------------|
+| `SELECT * FROM usuario` | Denegado | Denegado |
+| `SELECT * FROM v_usuario_seguro` | Permitido | Permitido |
+| `INSERT INTO mensaje_contacto` | Permitido | — |
+| `SELECT * FROM mensaje_contacto` | Denegado | Permitido |
+| `SELECT * FROM rpt_top_clientes` | Denegado | Permitido |
+
+La aplicación puede escribir mensajes de contacto pero no leerlos. Esta separación obligó a que el panel administrativo utilizara un segundo grupo de conexiones con el rol `rge_panel`, lo cual resultó ser la arquitectura correcta: fueron los permisos de la base de datos los que impusieron esa decisión.
+
+Se detectó también un caso relacionado: la operación `INSERT ... RETURNING` requiere permiso de lectura sobre las columnas devueltas. Como `rge_flask` solo tiene permiso de escritura sobre `mensaje_contacto`, se eliminó la cláusula `RETURNING` del registro de mensajes, algo que además evita exponer identificadores internos hacia el exterior.
 
 ### 2.4 Autorización en diferentes niveles
 
@@ -59,11 +69,15 @@ Una solicitud a los reportes pasa por tres controles:
 
 Así, la autorización no depende únicamente de una comprobación en el frontend o en Flask.
 
+La reposición de stock añade un cuarto control: el procedimiento `sp_reponer_stock` vuelve a consultar el `nivel_acceso` del administrador dentro de PostgreSQL y rechaza la operación si es inferior a 2, aunque Flask ya la hubiese autorizado.
+
 ## 3. Protección de credenciales
 
 ### 3.1 Contraseñas de usuarios
 
 Las contraseñas se almacenan mediante bcrypt con 12 rondas. El valor original no se guarda en texto plano, no se escribe en los registros del servidor y tampoco se devuelve al navegador.
+
+Bcrypt es una función de un solo sentido, por lo que una contraseña olvidada no puede recuperarse: únicamente puede restablecerse generando un hash nuevo. Aunque alguien obtuviera una copia completa de la base, no obtendría ninguna contraseña.
 
 ### 3.2 Credenciales de PostgreSQL
 
@@ -75,9 +89,13 @@ Actualmente:
 - `database/07_credenciales.sql` contiene las credenciales y está incluido en `.gitignore`;
 - `07_credenciales.sql.example` funciona como plantilla sin información real.
 
+Ambas plantillas fueron eliminadas por error en un commit posterior y se restauraron, ya que sin ellas no es posible configurar el proyecto en un equipo nuevo.
+
 ### 3.3 Variables sensibles
 
 `backend/.env` almacena valores como la contraseña de la base, la clave de sesión y las credenciales utilizadas para el correo. Este archivo tampoco se sube al repositorio. En su lugar se mantiene `.env.example` como referencia de configuración.
+
+Antes de cada commit se comprueba con `git check-ignore` que `backend/.env`, `database/07_credenciales.sql` y `venv/` continúen excluidos.
 
 ### 3.4 Sesiones
 
@@ -101,8 +119,9 @@ La información importante se revisa en más de un lugar.
 | Cédula | Longitud de 10 dígitos | Dígito verificador | `CHECK` de longitud |
 | Contraseña | Mínimo 8 caracteres | `validar_password()` | Validación sobre el hash |
 | Precio | — | `Decimal > 0` | `CHECK precio > 0` |
-| Stock | — | `hay_stock()` | `CHECK stock >= 0` y trigger |
+| Stock por talla | Tope del selector | `hay_stock()` | `CHECK stock >= 0` y trigger |
 | Cantidad | — | `validar_cantidad()` | `CHECK cantidad > 0` |
+| Reposición | — | Entre 1 y 1000 | `CHECK` dentro del procedimiento |
 
 En total existen 56 restricciones `CHECK`, de las cuales 13 corresponden también a validaciones realizadas desde los formularios. Esto permite rechazar valores incorrectos incluso si una petición evita la interfaz web.
 
@@ -115,7 +134,17 @@ La base cuenta con:
 - 56 restricciones `CHECK`;
 - 21 índices.
 
-Las reglas de eliminación dependen de cada relación. Por ejemplo, un cliente con pedidos no se elimina mediante cascada porque es necesario conservar el historial; en cambio, un detalle depende completamente de su pedido y puede utilizar `CASCADE`.
+Las reglas de eliminación dependen de cada relación:
+
+| Relación | Regla | Motivo |
+|----------|-------|--------|
+| `pedido` → `cliente` | `RESTRICT` | Un cliente con ventas no debe borrarse: protege el historial |
+| `detalle_pedido` → `pedido` | `CASCADE` | Una línea no existe sin su pedido |
+| `direccion_envio` → `cliente` | `CASCADE` | Una dirección no existe sin su titular |
+| `mensaje_contacto` → `cliente` | `SET NULL` | El mensaje se conserva, sin quedar vinculado |
+| `detalle_pedido` → `producto_talla` | `RESTRICT` | Impide eliminar una talla que ya fue vendida |
+
+La restricción `UNIQUE (id_producto, id_talla)` garantiza que no puedan existir dos registros de inventario para la misma combinación.
 
 ### 4.3 Triggers y procedimientos
 
@@ -135,15 +164,31 @@ También existen 4 procedimientos almacenados: `sp_registrar_cliente`, `sp_regis
 
 Estas operaciones permiten concentrar procesos críticos en la base. Por ejemplo, el registro de un pedido se ejecuta como una operación transaccional para evitar que queden datos incompletos.
 
+El uso de triggers responde a que la base puede recibir cambios desde fuera de la aplicación, ya sea mediante pgAdmin o un script de mantenimiento. Si el descuento de stock viviera únicamente en Python, cualquiera de esas vías dejaría el inventario incorrecto.
+
 ### 4.4 Valores monetarios
 
 Para los valores económicos se utiliza `Decimal` en Python y `NUMERIC` en PostgreSQL en lugar de punto flotante.
 
 Como prueba, con un subtotal de $105.00 las capas calculan $15.75 de IVA y un total de $120.75.
 
-### 4.5 Auditoría
+### 4.5 Coherencia entre el precio mostrado y el cobrado
+
+Durante las pruebas se detectó que la vista SQL calculaba el precio aplicando únicamente el precio de oferta, mientras el cobro utilizaba `calcular_precio_final()` del modelo, que además aplica los recargos y descuentos propios de cada tipo de prenda. Siete de los veinticuatro productos mostraban un importe distinto al que se cobraba.
+
+Se corrigió haciendo que el catálogo utilice también el método del modelo. De esta forma la regla de negocio queda definida en un solo lugar y no puede desincronizarse.
+
+### 4.6 Auditoría
 
 La tabla `auditoria` registra información sobre cambios en productos, incluyendo la operación, el usuario de base de datos que la ejecutó, los valores anteriores y nuevos en formato `JSONB` y la fecha correspondiente.
+
+Cada reposición de stock realizada desde el panel queda registrada, junto con el administrador que la efectuó.
+
+### 4.7 Reproducibilidad de la estructura
+
+Los once scripts SQL numerados permiten reconstruir la base completa desde cero, y `setup.bat` los ejecuta en orden.
+
+Todos son reejecutables. Esto exigió tener en cuenta dos limitaciones de PostgreSQL: `CREATE TRIGGER` no admite `OR REPLACE`, y `CREATE OR REPLACE VIEW` no permite cambiar los nombres, el orden ni los tipos de las columnas. En ambos casos se antepone `DROP ... IF EXISTS`, y en el caso de las vistas se vuelven a conceder los permisos, porque al eliminar una vista se pierden.
 
 ## 5. Uso de SECURITY DEFINER
 
@@ -153,7 +198,7 @@ En lugar de ampliar todos los privilegios de `rge_flask`, determinadas funciones
 
 También se establece un `search_path` fijo para reducir el riesgo de que la función utilice objetos diferentes a los esperados.
 
-Esta configuración se aplica a `fn_trg_encolar_correo`, `fn_trg_auditar_producto`, `sp_cambiar_estado_pedido` y `sp_reponer_stock`.
+Esta configuración se aplica a `fn_trg_encolar_correo`, `fn_trg_auditar_producto`, `sp_cambiar_estado_pedido` y `sp_reponer_stock`, y se encuentra en `database/08_security_definer.sql`, incluido en el proceso de instalación.
 
 ## 6. Seguridad de la aplicación
 
@@ -171,6 +216,8 @@ De esta forma, `psycopg` trata los valores como datos y no como parte de la inst
 
 Para mostrar información proporcionada por usuarios se utilizan métodos como `document.createElement()` y `textContent`. No se inserta contenido de usuario mediante `innerHTML`.
 
+Esta regla es especialmente relevante en dos lugares donde el contenido proviene de terceros: la ficha de producto, que muestra nombre y descripción, y la ventana de mensajes del panel, que muestra el texto escrito por un visitante.
+
 ### 6.3 Errores
 
 Los detalles técnicos se registran en el servidor, mientras que el navegador recibe mensajes más generales. Esto evita revelar innecesariamente nombres de tablas u otros detalles internos.
@@ -178,6 +225,8 @@ Los detalles técnicos se registran en el servidor, mientras que el navegador re
 ### 6.4 Acceso a recursos
 
 No basta con comprobar el tipo de usuario. También se revisa que un cliente tenga permiso sobre el recurso solicitado. Por ejemplo, intentar consultar el pedido perteneciente a otro cliente produce una respuesta 403.
+
+Del mismo modo, una cuenta administrativa no puede registrar pedidos, ya que la tabla `pedido` referencia a `cliente`. El servicio verifica el rol antes de procesar y responde 403 con un mensaje comprensible, en lugar de producir un error interno.
 
 ### 6.5 Recursos externos
 
@@ -189,19 +238,23 @@ La estrategia utiliza `pg_dump` en formato personalizado y `pg_restore` para la 
 
 El rol `rge_respaldo` posee permisos de solo lectura. De esta manera, el proceso de respaldo puede consultar la información sin modificarla accidentalmente.
 
-Las imágenes no se incluyen en el respaldo de PostgreSQL porque forman parte del repositorio Git.
+Las imágenes no se incluyen en el respaldo de PostgreSQL porque forman parte del repositorio Git. El principio que guía la estrategia es que el código siempre puede recuperarse desde GitHub, mientras que los datos no.
+
+Los roles y permisos se respaldan en un archivo aparte mediante `pg_dumpall --roles-only`, ya que `pg_dump` no los incluye: pertenecen al servidor y no a la base.
 
 ## 8. Resumen
 
 Las principales medidas implementadas son:
 
 - 7 roles de base de datos;
-- permisos limitados y vistas seguras;
-- bcrypt con 12 rondas;
+- permisos limitados por columna y vistas seguras;
+- bcrypt con 12 rondas, irreversible por diseño;
 - archivos `.env` y credenciales SQL fuera del repositorio;
 - cookies configuradas con `HttpOnly` y `SameSite=Lax`;
 - 56 `CHECK`, 24 claves foráneas, 19 `UNIQUE` y 21 índices;
-- 7 triggers y 4 procedimientos;
-- consultas parametrizadas;
-- auditoría;
+- 7 triggers y 4 procedimientos, cuatro de ellos con `SECURITY DEFINER`;
+- consultas parametrizadas y construcción del DOM sin `innerHTML`;
+- precio calculado en un único lugar;
+- auditoría de cambios y reposiciones;
+- scripts reejecutables que reconstruyen la base completa;
 - respaldo con un rol de solo lectura.
