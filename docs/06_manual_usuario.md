@@ -1,7 +1,7 @@
 # Manual de Usuario
 
 **Red Goat Eyes — Tienda de ropa urbana**  
-Versión 1.0 · Agosto 2026
+Versión 2.0 · Agosto 2026
 
 ---
 
@@ -34,7 +34,9 @@ python -m pip install -r backend/requirements.txt
 
 #### 3. Crear la base
 
-Desde pgAdmin y utilizando una conexión como `postgres`, ejecutar los archivos de `database/` en el siguiente orden:
+La forma más rápida es ejecutar `database/setup.bat`, que corre los once scripts en el orden correcto y solicita la contraseña de `postgres`.
+
+Si se prefiere hacerlo manualmente desde pgAdmin, utilizando una conexión como `postgres`, el orden es:
 
 ```text
 00_create_database.sql
@@ -46,9 +48,19 @@ Desde pgAdmin y utilizando una conexión como `postgres`, ejecutar los archivos 
 06_roles_permisos.sql
 07_credenciales.sql
 08_security_definer.sql
+09_datos_demo.sql
 ```
 
 `07_credenciales.sql` no se incluye con credenciales reales en el repositorio. Se debe copiar `07_credenciales.sql.example`, cambiar su nombre y configurar las contraseñas correspondientes.
+
+El script `09_datos_demo.sql` deja el catálogo con las tallas S, M, L y XL para hoodies y pantalones, talla única para accesorios y 20 unidades por talla. También crea la cuenta administrativa inicial.
+
+Al terminar se puede comprobar la instalación con:
+
+```text
+SELECT COUNT(*) FROM v_catalogo_publico;   -- deben ser 24
+SELECT COUNT(*) FROM producto_talla;       -- deben ser 72
+```
 
 #### 4. Configurar las variables de entorno
 
@@ -85,27 +97,48 @@ Para detener el servidor se utiliza `Ctrl + C`.
 
 Desde la página principal se puede ingresar por **Categorías** para elegir Hoodies, Pantalones o Accesorios, o abrir **Productos** para revisar los 24 artículos.
 
-Cada tarjeta muestra la imagen, el nombre y el precio. Los valores se obtienen desde la base de datos.
+Cada tarjeta muestra la imagen, el nombre, el precio, una etiqueta con las unidades disponibles y las tallas existentes. Todos esos valores se obtienen desde la base de datos.
 
-Si un producto no tiene existencias, permanece visible pero aparece como **Agotado**.
+La etiqueta de stock indica el total del producto sumando sus tallas. Si un producto no tiene existencias, permanece visible pero aparece como **Agotado**.
 
-### 3.2 Agregar al carrito
+### 3.2 Ver la ficha del producto
 
-Para añadir un artículo se presiona **Agregar al carrito**. El sistema muestra una confirmación y actualiza el contador situado junto al icono del carrito.
+Al pulsar sobre una tarjeta o el botón **Ver detalles** se abre una ficha con:
 
-Antes de aceptar la cantidad se comprueba el stock disponible.
+- la imagen ampliada;
+- la descripción completa;
+- las tallas disponibles, cada una con su stock;
+- un selector de cantidad.
 
-### 3.3 Administrar el carrito
+Las tallas sin unidades aparecen deshabilitadas. Al elegir una talla, el sistema indica cuántas unidades quedan de esa talla en concreto.
 
-Dentro del carrito se puede:
+Para cerrar la ficha se puede pulsar la equis, hacer clic fuera de ella o presionar la tecla Escape.
+
+### 3.3 Agregar al carrito
+
+Dentro de la ficha:
+
+1. elegir la talla;
+2. ajustar la cantidad con `−` y `+`;
+3. pulsar **Añadir al carrito**.
+
+El selector no permite superar el stock de la talla elegida e informa el motivo. Antes de agregar, el sistema vuelve a comprobar la disponibilidad contra el servidor.
+
+El contador junto al icono del carrito se actualiza y aparece una confirmación.
+
+> Cada talla se maneja como una línea independiente. Si se agrega el mismo hoodie en talla M y en talla L, el carrito mostrará dos líneas separadas.
+
+### 3.4 Administrar el carrito
+
+Dentro del carrito cada línea muestra el producto y su talla. Se puede:
 
 - aumentar la cantidad con `+`;
 - disminuirla con `−`;
-- eliminar el producto.
+- eliminar la línea.
 
 También se presentan el subtotal, el IVA del 15 % y el total. Estos valores se calculan en el servidor.
 
-### 3.4 Crear una cuenta
+### 3.5 Crear una cuenta
 
 No es obligatorio registrarse para preparar el carrito, pero sí para continuar al pago.
 
@@ -123,13 +156,15 @@ Los datos solicitados son:
 
 Los mensajes de validación aparecen debajo del campo que contiene el problema.
 
-### 3.5 Iniciar sesión
+> Conviene revisar el correo antes de enviar. Un error como escribir `.con` en lugar de `.com` impide que llegue el comprobante, y ningún sistema puede detectarlo porque ambas formas son válidas.
+
+### 3.6 Iniciar sesión
 
 Se ingresa el correo y la contraseña.
 
 Si el inicio de sesión se solicitó al intentar pagar, después de autenticarse el usuario vuelve al proceso de pago sin perder el contenido del carrito.
 
-### 3.6 Realizar el pedido
+### 3.7 Realizar el pedido
 
 En la pantalla de pago:
 
@@ -142,15 +177,17 @@ En la pantalla de pago:
 
 El envío se registra con valor $0.00.
 
-### 3.7 Comprobante
+> Una cuenta administrativa no puede realizar compras. Si se intenta, el sistema indica que debe iniciarse sesión con una cuenta de cliente.
 
-Después de confirmar se muestra una página con el código del pedido, sus productos, subtotal, IVA, total, dirección y método de pago.
+### 3.8 Comprobante
+
+Después de confirmar se muestra una página con el código del pedido, sus productos con la talla comprada, subtotal, IVA, total, dirección y método de pago.
 
 El código utiliza un formato como `RGE-2026-0001`.
 
 También se intenta enviar al correo registrado un recibo en PDF. Si el envío del correo falla, la compra permanece registrada y el envío puede reintentarse.
 
-### 3.8 Historial de pedidos
+### 3.9 Historial de pedidos
 
 Con una sesión activa, el cliente puede consultar sus propios pedidos y revisar su estado.
 
@@ -160,13 +197,15 @@ La secuencia principal es:
 
 Cada cliente puede consultar únicamente sus propias compras.
 
-### 3.9 Contacto
+### 3.10 Contacto
 
 El formulario de contacto solicita nombre, correo, ciudad, asunto y un mensaje de mínimo 10 caracteres.
 
-Cuando existe una sesión activa, el nombre y correo pueden completarse automáticamente.
+Cuando existe una sesión activa, el nombre y correo se completan automáticamente.
 
-### 3.10 Cerrar sesión
+El mensaje queda registrado en el sistema y además se envía un aviso al buzón de la tienda, de modo que el administrador pueda responderlo.
+
+### 3.11 Cerrar sesión
 
 Abrir el menú de usuario y seleccionar **Cerrar sesión**.
 
@@ -174,33 +213,69 @@ Abrir el menú de usuario y seleccionar **Cerrar sesión**.
 
 ### 4.1 Acceso
 
-Una cuenta con rol de administrador es dirigida al panel correspondiente. Las cuentas de cliente no tienen acceso a la información administrativa.
+Al iniciar sesión, una cuenta con rol de administrador es dirigida automáticamente al panel.
 
-### 4.2 Reportes
+El menú de usuario muestra el rol de la sesión activa y una opción **Panel de administración**, disponible desde cualquier página del sitio. Esa opción solo aparece para cuentas administrativas.
 
-El panel permite consultar ventas por categoría y un ranking de clientes. Los reportes pueden mostrar información como unidades vendidas, total de ventas, ciudad, cantidad de pedidos y ticket promedio.
+Si una cuenta de cliente intenta abrir la dirección del panel directamente, las tablas se bloquean con un aviso y la API rechaza las consultas.
 
-### 4.3 Productos
+### 4.2 Indicadores generales
 
-Se muestran los 24 productos con su código, categoría, precio, stock y estado.
+La pestaña **Reportes** comienza con cinco tarjetas que resumen productos activos, clientes registrados, pedidos, mensajes sin leer y alertas de stock.
 
-### 4.4 Pedidos
+La tarjeta de alertas cambia de color cuando existe al menos un producto en nivel crítico.
 
-El administrador puede revisar los pedidos registrados, incluyendo código, cliente, fecha, total y estado.
+### 4.3 Reportes
 
-### 4.5 Mensajes
+El panel permite consultar ventas por categoría y un ranking de clientes. Los reportes muestran información como unidades vendidas, total de ventas, ciudad, cantidad de pedidos y ticket promedio.
 
-Los mensajes recibidos mediante el formulario de contacto pueden aparecer como **Pendiente**, **Leído** o **Respondido**.
+El reporte de ventas puede filtrarse por período mediante los campos **Desde** y **Hasta**, pulsando después **Generar**.
 
-### 4.6 Niveles administrativos
+### 4.4 Productos
+
+Se muestran los 24 productos con su código, categoría, precio, stock total y estado.
+
+### 4.5 Inventario y reposición
+
+La pestaña **Inventario** muestra las 72 combinaciones de producto y talla, con su stock actual, el mínimo configurado y su estado.
+
+| Estado | Significado |
+|--------|-------------|
+| Normal | Stock por encima del mínimo |
+| Critico | Stock igual o menor al mínimo, fila resaltada en amarillo |
+| Agotado | Sin unidades, fila resaltada en rojo |
+
+El desplegable **Mostrar** permite filtrar por nivel crítico o agotados.
+
+Para reponer stock:
+
+1. pulsar **Reponer** en la fila correspondiente, con lo que el formulario se completa automáticamente;
+2. o completar el formulario manualmente indicando código, talla y unidades;
+3. pulsar **Reponer stock**.
+
+El sistema confirma el stock resultante y actualiza la tabla y los indicadores. La operación requiere nivel 2 o superior y queda registrada en la auditoría con el administrador que la realizó.
+
+### 4.6 Pedidos
+
+El administrador puede revisar todos los pedidos registrados, incluyendo código, cliente, fecha, total y estado.
+
+### 4.7 Mensajes
+
+La tabla muestra la fecha, el remitente, su correo, la ciudad, el asunto y el estado, que puede ser **Pendiente**, **Leido** o **Respondido**.
+
+Al pulsar cualquier fila se abre una ventana con el mensaje completo y un botón **Responder por correo**, que abre el gestor de correo con el destinatario y el asunto ya escritos.
+
+Cada mensaje llega también al buzón de la tienda. Al responder ese correo, la respuesta va directamente al cliente.
+
+### 4.8 Niveles administrativos
 
 | Nivel | Permisos principales |
 |-------|----------------------|
-| 1 — Consulta | Catálogo, reportes y mensajes |
-| 2 — Gestión | Incluye lo anterior y permite gestionar productos, stock, pedidos y respuestas |
+| 1 — Consulta | Catálogo, reportes, inventario y mensajes |
+| 2 — Gestión | Incluye lo anterior y permite gestionar productos, reponer stock, cambiar estados de pedido y responder mensajes |
 | 3 — Total | Incluye lo anterior y añade gestión de usuarios y auditoría |
 
-### 4.7 Reintento de correos
+### 4.9 Reintento de correos
 
 Si existen correos pendientes, se puede ejecutar:
 
@@ -210,6 +285,20 @@ python enviar_correos.py
 ```
 
 El proceso informa la cantidad de mensajes pendientes, enviados y fallidos.
+
+### 4.10 Consultar los usuarios registrados
+
+Desde pgAdmin:
+
+```text
+SELECT rol, COUNT(*) FROM v_usuario_seguro GROUP BY rol;
+
+SELECT id_usuario, rol, email, nombres, apellidos, ciudad, activo, ultimo_acceso
+FROM v_usuario_seguro
+ORDER BY rol, id_usuario;
+```
+
+La vista `v_usuario_seguro` es la única forma de consultar usuarios desde la aplicación, ya que no expone el hash de contraseña.
 
 ## 5. Problemas frecuentes
 
@@ -223,7 +312,11 @@ Abrir el proyecto mediante `http://127.0.0.1:5000/` y no directamente como un ar
 
 ### Aparece un error de permisos
 
-Comprobar que `database/08_security_definer.sql` haya sido ejecutado desde pgAdmin con los permisos necesarios.
+Comprobar que `database/08_security_definer.sql` haya sido ejecutado desde pgAdmin con una conexión de `postgres`.
+
+### El catálogo muestra productos repetidos
+
+Indica que la vista `v_catalogo_publico` no fue actualizada. Debe ejecutarse `database/05_views_reportes.sql` completo, que reemplaza la vista por su versión agrupada.
 
 ### No llega el comprobante
 
@@ -240,3 +333,22 @@ El sistema comprueba el dígito verificador ecuatoriano. Se debe utilizar una c�
 ### El sistema solicita iniciar sesión al pagar
 
 La sesión puede haber expirado. Se debe iniciar sesión nuevamente; el carrito se conserva.
+
+### No se puede completar una compra con la cuenta administrativa
+
+Es el comportamiento esperado. Los pedidos se asocian a clientes, por lo que debe utilizarse una cuenta de cliente.
+
+### Se olvidó una contraseña
+
+Las contraseñas no pueden recuperarse porque se almacenan con bcrypt, que es irreversible. Debe generarse un hash nuevo y actualizarlo:
+
+```text
+cd backend
+python -c "from app.services.auth_service import AuthService; print(AuthService().hashear('NuevaClave'))"
+```
+
+Después se actualiza en pgAdmin:
+
+```text
+UPDATE usuario SET password_hash = '<hash generado>' WHERE email = '<correo>';
+```
