@@ -196,6 +196,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             filas = filas.filter(function (f) { return f.agotado; });
         }
 
+            llenarSelectTallas(datos.inventario);
+
         const contador = document.getElementById("inventario-contador");
         if (contador) {
             contador.textContent = datos.total + " combinaciones  ·  " +
@@ -250,6 +252,29 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+    function llenarSelectTallas(inventario) {
+        const select = document.getElementById("reponer-talla");
+
+        if (!select || select.options.length > 1) {
+            return;
+        }
+
+        const vistas = [];
+
+        inventario.forEach(function (registro) {
+            if (vistas.indexOf(registro.talla) === -1) {
+                vistas.push(registro.talla);
+            }
+        });
+
+        vistas.forEach(function (talla) {
+            const opcion = document.createElement("option");
+            opcion.value = talla;
+            opcion.textContent = talla;
+            select.appendChild(opcion);
+        });
+    }
+
     function prepararReposicion(registro) {
         escribirCampo("reponer-codigo", registro.codigo);
         escribirCampo("reponer-talla", registro.talla);
@@ -281,7 +306,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             const respuesta = await rgeApi("/productos/reponer", {
                 cuerpo: {
                     codigo_producto: valorCampo("reponer-codigo").toUpperCase(),
-                    codigo_talla: valorCampo("reponer-talla").toUpperCase(),
+                    codigo_talla: valorCampo("reponer-talla"),
                     cantidad: parseInt(valorCampo("reponer-cantidad"), 10)
                 }
             });
